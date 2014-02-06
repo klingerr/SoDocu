@@ -1,0 +1,13 @@
+[idea]
+id: 	idea-2
+name: 	offer a web GUI for easy usage
+description: For creating, updating and showing dependencies between 
+ requirements a GUI would be nice. To prevent installation and for publishing
+ the GUI should be web based.
+inventedBy: src-1
+
+[meta]
+createdBy: rklinger
+createdAt: 4.2.2014 15:20:23
+changedBy: 
+changedAt: 

@@ -1,0 +1,8 @@
+[glossary]
+stakeholder: a person, group or organization with an interest in a project. see http://en.wikipedia.org/wiki/Stakeholder_management
+
+[meta]
+createdBy: rklinger
+createdAt: 4.2.2014 15:20:23
+changedBy: 
+changedAt: 

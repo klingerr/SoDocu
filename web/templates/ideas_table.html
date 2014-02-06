@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}{{ short_id }}s{% endblock %}
+{% block body %}
+  <h2>{{ short_id }}s</h2>
+  
+<!-- <div class="CSSTableGenerator" > -->
+  <table class="table" id="items">
+    <thead>
+      <th>ID</th>
+      <th>Name</th>
+      <th id="description">Bescheibung</th>
+      <th>Erstellt von</th>
+      <th>Erstellt am</th>
+      <th></th>
+    </thead>
+    {%- for idea in sodocu.get_ideas() %}
+    <tr id="{{ idea.id }}">
+      <td>{{ idea.id }}</td>
+      <td class="editable">{{ idea.name }}</td>
+      <td class="growable">{{ idea.description|new_line_to_br|safe }}</td>
+      <td>{{ idea.createdBy }}</td>
+      <td>{{ idea.createdAt }}</td>
+      <td><a href="javascript:;" title="delete '{{ idea.id }}'" class="delete no-underline">x</a></td>
+    </tr>
+    {%- endfor %}
+  </table>
+<!-- </div> -->
+
+{% endblock %}

@@ -1,0 +1,11 @@
+[requirementSource]
+id: 	src-1
+type:	stakeholder
+name: 	Tester
+description: A tester tests the program according to given requirements.
+
+[meta]
+createdBy: rklinger
+createdAt: 31.1.2014 14:58:45
+changedBy: 
+changedAt: 

@@ -1,0 +1,12 @@
+[idea]
+id: 	idea-1
+name: 	use VCS for Requirements
+description: In order to store the history of an requirement we could use the
+ version control system.
+inventedBy: src-1
+
+[meta]
+createdBy: rklinger
+createdAt: 31.1.2014 14:58:45
+changedBy: 
+changedAt: 

@@ -1,0 +1,106 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} | SoDocu</title>
+<link rel="shortcut icon" href="/img/favicon.ico"  type="image/x-icon" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" />
+<!-- DataTables with jEdit-Plugin for inline table editing 
+@see http://www.dzone.com/links/r/creating_perfect_tables_with_datatables_and_jedit.html
+@see http://datatables.net/examples/api/editable.html
+--> 
+<link href="/css/table.css" media="screen" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery.datatables.js"></script>
+<script type="text/javascript" src="/js/jquery.jeditable.js"></script>
+<script type="text/javascript" src="/js/autogrow.min.js"></script>
+<script type="text/javascript" src="/js/jquery.jeditable.autogrow.js"></script>
+<script type="text/javascript" src="/js/jquery.blockui.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	var table = $("#items");
+	var oTable = table.dataTable({"sPaginationType": "full_numbers", 
+		"bStateSave": true,
+		"aaSorting": [[ 1, "desc" ]]
+	});
+
+	$(".editable", oTable.fnGetNodes()).editable("/item/", {
+		method: "PUT",
+		"callback": function(sValue, y) {
+			var fetch = sValue.split(",");
+			var aPos = oTable.fnGetPosition(this);
+			oTable.fnUpdate(fetch[1], aPos[0], aPos[1]);
+		},
+		"submitdata": function(value, settings) {
+			settings.target = "/item/" + this.parentNode.getAttribute("id");
+			return {
+				"id": this.parentNode.getAttribute("id"),
+				"attribute": $('#items th').eq($(this).index()).attr('id')
+			};
+		},
+		"height": "14px"
+	});
+
+	$(".growable", oTable.fnGetNodes()).editable("", {
+		type: "autogrow",
+		method: "PUT",
+		submit: 'Save',
+        cancel: 'Cancel',
+        tooltip: "Click to edit",
+		"callback": function(sValue, y) {
+			var fetch = sValue.split(",");
+			var aPos = oTable.fnGetPosition(this);
+			/* oTable.fnUpdate(fetch[1], aPos[0], aPos[1]); */
+            oTable.fnUpdate(sValue, aPos[0], aPos[1]);
+            /* Redraw the table from the new data on the server */
+            /* oTable.fnClearTable(); */
+            oTable.fnDraw(); 
+		},
+		"submitdata": function(value, settings) {
+			/* update the request URL */
+			settings.target = "/item/" + this.parentNode.getAttribute("id");
+			return {
+				"id": this.parentNode.getAttribute("id"),
+				"attribute": $('#items th').eq($(this).index()).attr('id')
+			};
+		}
+	});
+
+
+	$(document).on("click", ".delete", function() {
+		var item_id = this.parentNode.parentNode.getAttribute("id");
+		var parent = $("#"+item_id);
+		$.ajax({
+			type: "DELETE",
+			url: "/item/"+item_id,
+			data: "",
+			beforeSend: function() {
+				table.block({
+					message: "",
+					css: {
+						border: "none",
+						backgroundColor: "none"
+					},
+					overlayCSS: {
+						backgroundColor: "#fff",
+						opacity: "0.5",
+						cursor: "wait"
+					}
+				});
+			},
+			success: function(response) {
+				table.unblock();
+				var get = response.split(",");
+				if(get[0] == "success") {
+					$(parent).fadeOut(200,function() {
+						$(parent).remove();
+					});
+				}
+			}
+		});
+	});
+});
+</script>
+ 
+<div class=box>
+  <h1><a href=/>SoDocu</a></h1>
+  <p class=tagline>Software Documentation
+  {% block body %}{% endblock %}
+</div>
