@@ -35,10 +35,12 @@ class Idea(AbstractItem, MetaData):
         return 'Idea {' + AbstractItem.__str__(self) + MetaData.__str__(self) + '}' 
 
 
+
+
 def create_idea(config):
     idea = Idea(config.get('idea', 'id'), config.get('idea', 'name'))
     idea.set_description(config.get('idea', 'description'))
-#     idea.set_invented_by(config.get('idea', 'description'))
+#     idea.set_invented_by(config.get('idea', 'inventedBy'))
     idea.set_created_by(config.get('meta', 'createdBy'))
     idea.set_created_at(config.get('meta', 'createdAt'))
     idea.set_changed_by(config.get('meta', 'changedBy'))

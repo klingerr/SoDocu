@@ -6,7 +6,7 @@ Created on 03.02.2014
 
 import logging
 from src.persistence.DirectoryWalker import DirectoryWalker
-from src.persistence.FileReader import FileReader
+from src.persistence.FileHandler import FileHandler
 from src.model.Idea import Idea, create_idea
 from src.view.Gui import create_gui
 
@@ -25,8 +25,9 @@ class SoDocu(object):
         '''
         Reads all items into memory.
         '''
-        self.__fileReader = FileReader()
+        self.__fileHandler = FileHandler()
         self.__path = path
+        # TODO: change to a set with unique entries
         self.__ideas = []
         self.read_all_items()
 
@@ -43,7 +44,7 @@ class SoDocu(object):
     def read_all_items(self):
         directoryWalker = DirectoryWalker(self.get_path())
         for filename in directoryWalker.getFilenames():
-            config = self.__fileReader.readTxtFile(filename)
+            config = self.__fileHandler.read_file(filename)
             item = self.create_item(config)
             if isinstance(item, Idea):
                 self.add_idea(item)

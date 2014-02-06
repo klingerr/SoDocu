@@ -107,15 +107,16 @@ class Gui(object):
         
         log.debug('request.method: ' + request.method)
         if request.method == 'GET':
-            return self.render_template('ideas_table.html', 
-                                        sodocu=self.get_sodocu(), 
-                                        short_id=item_type)
+#             return self.render_template('ideas_table.html', 
+#                                         sodocu=self.get_sodocu(), 
+#                                         short_id=item_type)
+            pass
         elif self.is_put_request(request):
             log.debug('request.method: PUT')
             log.debug("request.form['id']: " + request.form['id'])
             
             if item_id != request.form['id']:
-                raise MethodNotAllowed()
+                raise MethodNotAllowed(description='URL and form data do not match!')
             
             attribute = request.form['attribute']
             log.debug("attribute: " + attribute)
