@@ -4,6 +4,7 @@ Created on 03.02.2014
 @author: RKlinger
 '''
 
+import os
 import logging
 from src.persistence.DirectoryWalker import DirectoryWalker
 from src.persistence.FileHandler import FileHandler
@@ -25,8 +26,8 @@ class SoDocu(object):
         '''
         Reads all items into memory.
         '''
-        self.__fileHandler = FileHandler()
-        self.__path = path
+        self.__path = os.path.abspath(path)
+        self.__fileHandler = FileHandler(self.__path)
         # TODO: change to a set with unique entries
         self.__ideas = []
         self.read_all_items()
@@ -74,6 +75,6 @@ class SoDocu(object):
         
 if __name__ == '__main__':
     from werkzeug.serving import run_simple
-    sodoku = SoDocu("C:\workspace\Head\SoDocu\sodocu")
+    sodoku = SoDocu("../sodocu")
     gui = create_gui(sodoku)
-    run_simple('127.0.0.1', 80, gui, use_debugger=True, use_reloader=True)
+    run_simple('127.0.0.1', 8080, gui, use_debugger=True, use_reloader=True)
