@@ -7,7 +7,7 @@ description: For creating, updating and showing dependencies between
 inventedBy: src-1
 
 [meta]
-createdBy: rklinger
-createdAt: 4.2.2014 15:20:23
-changedBy: 
-changedAt: 
+created_by: rklinger
+created_at: 4.2.2014 15:20:23
+changed_by: 
+changed_at: 

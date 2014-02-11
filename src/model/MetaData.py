@@ -5,6 +5,7 @@ Created on 03.02.2014
 '''
 
 import datetime
+import ConfigParser
 
 class MetaData(object):
     '''
@@ -52,7 +53,20 @@ class MetaData(object):
     changedBy = property(get_changed_by, set_changed_by, None, None)
     changedAt = property(get_changed_at, set_changed_at, None, None)
 
+
     def __str__(self):
-        createdBy = str(self.get_created_by()) if hasattr(self, 'createdBy') else 'None'
-        createdAt = str(self.get_created_at()) if hasattr(self, 'createdAt') else 'None'
+        createdBy = str(self.get_created_by()) if hasattr(self, 'createdBy') else ''
+        createdAt = str(self.get_created_at()) if hasattr(self, 'createdAt') else ''
         return '[createdBy=' + createdBy + ', createdAt=' + createdAt + ']' 
+
+
+    def __config__(self):
+        config = ConfigParser.ConfigParser()
+        
+        config.add_section('meta')
+        config.set('meta', 'created_by', str(self.get_created_by()) if hasattr(self, 'createdBy') else '')
+        config.set('meta', 'created_at', str(self.get_created_at()) if hasattr(self, 'createdAt') else '')
+        config.set('meta', 'changed_by', str(self.get_changed_by()) if hasattr(self, 'changedBy') else '')
+        config.set('meta', 'changed_at', str(self.get_changed_at()) if hasattr(self, 'changedAt') else '')
+        return config       
+    

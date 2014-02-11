@@ -23,7 +23,7 @@ class TestSoDocu(unittest.TestCase):
 #         for idea in sodocu.get_ideas(): 
 #             print idea 
         print len(self.sodocu.get_ideas())
-        assert len(self.sodocu.get_ideas()) == 2
+        assert len(self.sodocu.get_ideas()) > 0
 
 
     def test_get_item_by_idea(self):

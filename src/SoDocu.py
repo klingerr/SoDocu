@@ -35,17 +35,27 @@ class SoDocu(object):
     def get_path(self):
         return self.__path
 
+
+    def get_file_handler(self):
+        return self.__fileHandler
+
+
     def get_ideas(self):
         return self.__ideas
 
+
     def add_idea(self, value):
         self.__ideas.append(value)
+
+    path = property(get_path, None, None, None)
+    fileHandler = property(get_file_handler, None, None, None)
+    ideas = property(get_ideas, None, None, None)
 
         
     def read_all_items(self):
         directoryWalker = DirectoryWalker(self.get_path())
         for filename in directoryWalker.getFilenames():
-            config = self.__fileHandler.read_file(filename)
+            config = self.get_file_handler().read_file(filename)
             item = self.create_item(config)
             if isinstance(item, Idea):
                 self.add_idea(item)

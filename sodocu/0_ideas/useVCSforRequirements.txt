@@ -6,7 +6,7 @@ description: In order to store the history of an requirement we could use the
 inventedBy: src-1
 
 [meta]
-createdBy: rklinger
-createdAt: 31.1.2014 14:58:45
-changedBy: 
-changedAt: 
+created_by: rklinger
+created_at: 31.1.2014 14:58:45
+changed_by: 
+changed_at: 

@@ -2,10 +2,11 @@
 id = idea-99
 name = this is a file writer test
 description = None
+inventedby = None
 
 [meta]
-createdby = 
-createdat = 
-changedby = 
-changedat = 
+created_by = 
+created_at = 
+changed_by = 
+changed_at = 
 

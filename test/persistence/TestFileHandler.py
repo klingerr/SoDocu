@@ -14,7 +14,8 @@ class TestFileHandler(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.fileHandler = FileHandler(os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir)))
+        self.project_root_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir))
+        self.fileHandler = FileHandler(self.project_root_path)
  
  
     @classmethod 
@@ -23,14 +24,20 @@ class TestFileHandler(unittest.TestCase):
 
 
     def test_read_file(self):
-        config = self.fileHandler.read_file('../../sodocu/0_ideas/useVCSforRequirements.txt')
+        config = self.fileHandler.read_file(self.project_root_path + '/sodocu/0_ideas/useVCSforRequirements.txt')
         assert 'meta' in config.sections()
 
 
     def test_write_file(self):
         idea1 = Idea('idea-99', 'this is a file writer test')
+#        print "hasattr(idea1, 'description'): " + str(hasattr(idea1, 'description'))
+#        print "hasattr(idea1, 'inventedBy'): " + str(hasattr(idea1, 'inventedBy'))
+
+#        print 'idea1.get_description(): ' + str(idea1.get_description())
+#        print 'idea1.get_invented_by(): ' + str(idea1.get_invented_by())
+
         self.fileHandler.write_file(idea1)
-        config = self.fileHandler.read_file('../../sodocu/0_ideas/ThisIsAFileWriterTest.txt')
+        config = self.fileHandler.read_file(self.project_root_path + '/sodocu/0_ideas/ThisIsAFileWriterTest.txt')
         idea2 = create_idea(config)
         assert idea1.get_id() == idea2.get_id()
 

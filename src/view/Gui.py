@@ -218,7 +218,7 @@ class Gui(object):
     def get_sodocu(self):
         return self.__sodocu
 
-#     sodocu = property(get_sodocu, None, None, None)
+    sodocu = property(get_sodocu, None, None, None)
 
 
 def create_gui(sodocu, with_static=True):
