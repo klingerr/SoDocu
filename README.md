@@ -25,7 +25,7 @@ at folder "sodocu".
 SoDocu is inspired by rmtoo: http://www.flonatel.de/projekte/rmtoo/
 
 # Installation
-* install Python 2.7.x
+* install [Python 2.7.x](http://www.python.org/):
   * Linux: should already be installed
   * Windows: http://www.python.org/download/
 * install [pip](http://www.pip-installer.org/): 
