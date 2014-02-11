@@ -10,7 +10,7 @@ class TestSoDocu(unittest.TestCase):
     
     @classmethod
     def setUpClass(self):
-        self.sodocu = SoDocu("C:\workspace\Head\SoDocu\sodocu")
+        self.sodocu = SoDocu("../sodocu")
  
  
     @classmethod 
