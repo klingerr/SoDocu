@@ -26,15 +26,15 @@ SoDocu is inspired by rmtoo: http://www.flonatel.de/projekte/rmtoo/
 
 # Installation
 * install Python 2.7.x
-  * Linux: should already installed
+  * Linux: should already be installed
   * Windows: http://www.python.org/download/
-* install pip: 
+* install [pip](http://www.pip-installer.org/): 
   * Linux: sudo apt-get install python-pip
   * Windows: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pip
-* install Werkzeug: 
+* install [Werkzeug](http://werkzeug.pocoo.org/): 
   * Linux: sudo pip install Werkzeug
   * Windows: pip install Werkzeug
-* install Jinja2: 
+* install [Jinja2](http://jinja.pocoo.org/): 
   * Linux: sudo pip install Jinja2
   * Windows: pip install Jinja2
 * install SoDocu: 
