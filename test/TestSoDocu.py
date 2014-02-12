@@ -20,13 +20,13 @@ class TestSoDocu(unittest.TestCase):
 
 
     def test_read_ideas(self):
-#         for idea in sodocu.get_ideas(): 
-#             print idea 
-        print len(self.sodocu.get_ideas())
+#         for idea in self.sodocu.get_ideas(): 
+#             print idea.get_filename()
+#         print len(self.sodocu.get_ideas())
         assert len(self.sodocu.get_ideas()) > 0
 
 
-    def test_get_item_by_idea(self):
+    def test_get_item_by_id(self):
         item = self.sodocu.get_item_by_id('idea-1')
 #         print item.get_id()
         assert item.get_id() == 'idea-1'

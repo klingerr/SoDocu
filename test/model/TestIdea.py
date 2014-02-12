@@ -42,8 +42,8 @@ class TestIdea(unittest.TestCase):
         
 
     def test_to_string(self):
-        print 'self.idea.get_description(): ' + str(self.idea.get_description())
-        print 'self.idea.get_invented_by(): ' + str(self.idea.get_invented_by())
+#         print 'self.idea.get_description(): ' + str(self.idea.get_description())
+#         print 'self.idea.get_invented_by(): ' + str(self.idea.get_invented_by())
         assert self.idea.__str__() == 'Idea {[id=1, name=use Python language][createdBy=rklinger, createdAt=2014-02-03 13:33]}' 
 
 

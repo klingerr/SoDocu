@@ -4,7 +4,7 @@ Created on 03.02.2014
 @author: RKlinger
 '''
 from AbstractItem import AbstractItem
-from MetaData import MetaData
+from MetaData import MetaData, merge_meta_config
 from Stakeholder import Stakeholder
 
 class Idea(AbstractItem, MetaData):
@@ -35,20 +35,11 @@ class Idea(AbstractItem, MetaData):
 
     
     def __config__(self):
+        meta_config = MetaData.__config__(self)
         abstract_config = AbstractItem.__config__(self)
-        self.merge_meta_config(abstract_config)
+        config = merge_meta_config(meta_config, abstract_config)
         abstract_config.set('idea', 'inventedBy', self.get_invented_by() if hasattr(self, 'inventedBy') else '')
-        return abstract_config        
-
-
-    def merge_meta_config(self, config):
-        '''
-        Copies options from MetaData into given config.
-        '''
-        config2 = MetaData.__config__(self)
-        config.add_section('meta')
-        for option in config2.options('meta'):
-            config.set('meta', option, config2.get('meta', option))
+        return config        
 
 
     def __str__(self):

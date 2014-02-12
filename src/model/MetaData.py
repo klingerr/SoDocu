@@ -69,4 +69,13 @@ class MetaData(object):
         config.set('meta', 'changed_by', str(self.get_changed_by()) if hasattr(self, 'changedBy') else '')
         config.set('meta', 'changed_at', str(self.get_changed_at()) if hasattr(self, 'changedAt') else '')
         return config       
-    
+
+
+def merge_meta_config(meta_config, abstract_config):
+    '''
+    Copies options from MetaData into given config.
+    '''
+    abstract_config.add_section('meta')
+    for option in meta_config.options('meta'):
+        abstract_config.set('meta', option, meta_config.get('meta', option))
+    return abstract_config

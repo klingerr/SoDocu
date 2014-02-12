@@ -1,6 +1,6 @@
 [idea]
 id = idea-99
-name = this is a file writer test
+name = this is a file update test
 description = None
 inventedby = None
 

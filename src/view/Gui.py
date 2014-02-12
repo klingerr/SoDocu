@@ -15,16 +15,18 @@ from werkzeug.wsgi import SharedDataMiddleware
 from werkzeug.utils import redirect
 from jinja2 import Environment, FileSystemLoader
 
+log = logging.getLogger('Gui')
+# console logger
+# log.addHandler(logging.StreamHandler())
+# log.setLevel(logging.DEBUG)
+
+
 def new_line_to_br(value):
     '''
     Custom jinja2 filter for replacing carriage return and new line with <br />.
     '''
     return value.replace("\n", "<br />")
 
-log = logging.getLogger('werkzeug')
-# console logger
-log.addHandler(logging.StreamHandler())
-log.setLevel(logging.DEBUG)
 
 class Gui(object):
     '''
@@ -76,6 +78,12 @@ class Gui(object):
             return e
 
 
+    def get_items(self, item_type):
+        get_items = getattr(self.get_sodocu(), 'get_' + item_type + 's')
+        items = get_items()
+        return items
+
+
     def on_item_list(self, request, item_type):
         '''
         On request type GET retrieves all items of specified type.
@@ -86,8 +94,8 @@ class Gui(object):
         
         if request.method == 'GET':
             return self.render_template('ideas_table.html', 
-                                        sodocu=self.get_sodocu(), 
-                                        short_id=item_type)
+                                        items=self.get_items(item_type), 
+                                        item_type=item_type)
         elif request.method == 'POST':
 #             short_id = self.insert_url(url)
 #             return redirect('/%s+' % short_id)
@@ -223,7 +231,8 @@ class Gui(object):
 
 def create_gui(sodocu, with_static=True):
     '''
-    Factory method for creating a new instance of Gui. 
+    Factory method for creating a new instance of Gui. Configuration of static
+    content locations is situated here too.
     '''
     gui = Gui(sodocu)
     if with_static:

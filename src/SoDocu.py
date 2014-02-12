@@ -5,16 +5,16 @@ Created on 03.02.2014
 '''
 
 import os
-import logging
+import logging.config
 from src.persistence.DirectoryWalker import DirectoryWalker
 from src.persistence.FileHandler import FileHandler
 from src.model.Idea import Idea, create_idea
 from src.view.Gui import create_gui
 
-log = logging.getLogger('sodocu')
+log = logging.getLogger('SoDocu')
 # console logger
-log.addHandler(logging.StreamHandler())
-log.setLevel(logging.DEBUG)
+# log.addHandler(logging.StreamHandler())
+# log.setLevel(logging.DEBUG)
 
 
 class SoDocu(object):
@@ -28,8 +28,7 @@ class SoDocu(object):
         '''
         self.__path = os.path.abspath(path)
         self.__fileHandler = FileHandler(self.__path)
-        # TODO: change to a set with unique entries
-        self.__ideas = []
+        self.__ideas = set()
         self.read_all_items()
 
     def get_path(self):
@@ -45,7 +44,7 @@ class SoDocu(object):
 
 
     def add_idea(self, value):
-        self.__ideas.append(value)
+        self.__ideas.add(value)
 
     path = property(get_path, None, None, None)
     fileHandler = property(get_file_handler, None, None, None)
@@ -54,10 +53,11 @@ class SoDocu(object):
         
     def read_all_items(self):
         directoryWalker = DirectoryWalker(self.get_path())
-        for filename in directoryWalker.getFilenames():
+        for filename in directoryWalker.get_filenames():
             config = self.get_file_handler().read_file(filename)
             item = self.create_item(config)
             if isinstance(item, Idea):
+                item.set_filename(filename)
                 self.add_idea(item)
 
 
@@ -82,8 +82,13 @@ class SoDocu(object):
         if 'idea' in config.sections():
             return create_idea(config)
 
+
+    def save_item(self, item):
+        self.get_file_handler().w
         
 if __name__ == '__main__':
+    logging.config.fileConfig('logging.conf')
+
     from werkzeug.serving import run_simple
     sodoku = SoDocu("../sodocu")
     gui = create_gui(sodoku)

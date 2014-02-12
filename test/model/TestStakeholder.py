@@ -13,7 +13,7 @@ class TestStakeholder(unittest.TestCase):
         stakeholder = Stakeholder(1, 'Developer')
         stakeholder.set_created_by('rklinger')
 #         stakeholder.set_created_now()
-        print stakeholder
+#         print stakeholder
         assert stakeholder.get_id() == 1
         assert stakeholder.get_name() == 'Developer'
         assert stakeholder.get_created_by() == 'rklinger'

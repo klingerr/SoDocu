@@ -4,6 +4,8 @@ Created on 31.01.2014
 @author: RKlinger
 '''
 import ConfigParser
+from src.utils.Utils import make_camel_case
+
 
 class AbstractItem(object):
     '''
@@ -17,6 +19,7 @@ class AbstractItem(object):
         self.__id = identity
         self.__name = name
         self.__description = None
+        self.__filename = None
 
     def get_id(self):
         return self.__id
@@ -36,9 +39,22 @@ class AbstractItem(object):
     def set_description(self, value):
         self.__description = value
 
+    def get_filename(self):
+        return self.__filename
+
+    def set_filename(self, value):
+        self.__filename = value
+
+    def get_basename(self):
+        '''
+        Returns the basename of the file made off the "camel cased" name.
+        '''
+        return make_camel_case(self.get_name())
+
     id = property(get_id, set_id, None, None)
     name = property(get_name, set_name, None, None)
     description = property(get_description, set_description, None, None)
+    filename = property(get_filename, set_filename, None, None)
 
     
     def __str__(self):
@@ -54,3 +70,7 @@ class AbstractItem(object):
         config.set(section_name, 'name', self.get_name())
         config.set(section_name, 'description', self.get_description() if hasattr(self, 'description') else '')
         return config        
+
+    def __eq__(self, other):
+#         return self.__dict__ == other.__dict__
+        return self.get_id() == other.get_id()

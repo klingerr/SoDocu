@@ -5,6 +5,7 @@ Created on 31.01.2014
 '''
 import unittest
 from src.model.AbstractItem import AbstractItem
+from setuptools.dist import assert_bool
 
 class TestAbstractItem(unittest.TestCase):
 
@@ -27,7 +28,7 @@ class TestAbstractItem(unittest.TestCase):
 
 
     def test_to_string(self):
-        print self.abstractItem
+#         print self.abst(ractItem
         assert self.abstractItem.__str__() == '[id=0, name=bla]' 
 
 
@@ -39,6 +40,16 @@ class TestAbstractItem(unittest.TestCase):
         assert config.has_option(section, 'name')
         assert config.has_option(section, 'description')
 
+
+    def test_equals(self):
+        abstractItem2 = AbstractItem(0, 'bla')
+        assert abstractItem2 == self.abstractItem
+        
+
+    def test_not_equals(self):
+        abstractItem2 = AbstractItem(1, 'bla')
+        assert abstractItem2 != self.abstractItem
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

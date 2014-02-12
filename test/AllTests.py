@@ -4,6 +4,10 @@ Created on 11.02.2014
 @author: RKlinger
 '''
 import unittest
+import logging.config
+
+
+logging.config.fileConfig('logging.conf')
 
 
 if __name__ == '__main__':
