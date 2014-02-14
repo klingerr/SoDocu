@@ -5,12 +5,14 @@ Created on 03.02.2014
 '''
 import unittest
 from src.SoDocu import SoDocu
+from src.utils.Config import Config
 
 class TestSoDocu(unittest.TestCase):
     
     @classmethod
     def setUpClass(self):
-        self.sodocu = SoDocu("../sodocu")
+        config = Config()
+        self.sodocu = SoDocu(config)
  
  
     @classmethod 

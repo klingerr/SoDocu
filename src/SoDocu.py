@@ -5,12 +5,12 @@ Created on 03.02.2014
 '''
 
 import logging.config
-import os
 
 from src.model.Idea import Idea, create_idea
 from src.persistence.DirectoryWalker import DirectoryWalker
-from src.persistence.FileHandler import FileHandler
+from src.persistence.FileHandler import FileHandler, read_file
 from src.view.Gui import create_gui
+from src.utils.Config import Config
 
 log = logging.getLogger('SoDocu')
 
@@ -20,15 +20,15 @@ class SoDocu(object):
     This is the start point of SoDocu.
     '''
 
-    def __init__(self, path):
+    def __init__(self, config):
         '''
         Reads all items into memory.
         '''
-        log.info('starting ...')
-        self.__path = os.path.abspath(path)
+        self.__path = config.get_sodocu_path()
         self.__fileHandler = FileHandler(self.__path)
         self.__ideas = set()
         self.read_all_items()
+
 
     def get_path(self):
         return self.__path
@@ -53,7 +53,7 @@ class SoDocu(object):
     def read_all_items(self):
         directoryWalker = DirectoryWalker(self.get_path())
         for filename in directoryWalker.get_filenames():
-            config = self.get_file_handler().read_file(filename)
+            config = read_file(filename)
             item = self.create_item(config)
             if isinstance(item, Idea):
                 item.set_filename(filename)
@@ -88,10 +88,10 @@ class SoDocu(object):
         
 if __name__ == '__main__':
     logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
-    
-    sodoku = SoDocu("../sodocu")
+    log.info('starting ...')
+    config = Config()
+    sodoku = SoDocu(config)
     gui = create_gui(sodoku)
     
     from werkzeug.serving import run_simple
-    log.info('starting web server ..')
-    run_simple('127.0.0.1', 80, gui, use_debugger=True, use_reloader=True)
+    run_simple('127.0.0.1', 8000, gui, use_debugger=True, use_reloader=True)

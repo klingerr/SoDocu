@@ -20,29 +20,16 @@ class FileHandler(object):
     file_extension = '.txt'
 
     
-    def __init__(self, path):
-        self.__path = path
+    def __init__(self, config):
+        self.__config = config
         
 
     def create_file(self, item):
         filename = item.get_camel_case_name() + self.file_extension
         directory = self.create_directory(item)
         item.set_filename(directory + '/' + filename)
-        log.info('writing file: ' + item.get_filename())
+        log.debug('writing file: ' + item.get_filename())
         self.write_file(item)
-
-
-    def read_file(self, filename):
-        '''
-        Reads a textfile as a config file from filesystem and returns its 
-        content as a config.
-        '''
-        config = ConfigParser.ConfigParser()
-        log.info('reading file: ' + filename)
-        dataset = config.read(filename)
-        if len(dataset) == 0:
-            raise ValueError, "File not found!"
-        return config
 
 
     def update_file(self, item):
@@ -56,12 +43,13 @@ class FileHandler(object):
 
 
     def delete_file(self, item):
-        log.info('deleting file: ' + item.get_filename())
+        log.debug('deleting file: ' + item.get_filename())
         os.remove(item.get_filename())
         
 
     def create_directory(self, item):
-        directory = self.get_path() + "/" + item.__class__.__name__.lower()
+        item_type = self.get_config().get_item_type(item.__class__.__name__.lower())
+        directory = self.get_config().get_sodocu_path() + item_type.get_path()
         log.debug('directory: ' + directory)
         if not os.path.exists(directory):
             log.info(directory + ' does not exists. Creating a new one.')
@@ -82,7 +70,20 @@ class FileHandler(object):
             log.warn("Error: can\'t find file or read data")
 
 
-    def get_path(self):
-        return self.__path
+    def get_config(self):
+        return self.__config
 
-    path = property(get_path, None, None, None)
+    config = property(get_config, None, None, None)
+
+
+def read_file(filename):
+    '''
+    Reads a textfile as a config file from filesystem and returns its 
+    content as a config.
+    '''
+    config = ConfigParser.ConfigParser()
+    log.debug('reading file: ' + filename)
+    dataset = config.read(filename)
+    if len(dataset) == 0:
+        raise ValueError, "File not found!"
+    return config

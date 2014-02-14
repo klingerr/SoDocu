@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
 #         print get_file_basename(path)
         assert get_file_basename(path) == 'ThisIsAFileWriterTest'
         
-
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

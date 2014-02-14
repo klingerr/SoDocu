@@ -40,7 +40,6 @@ class Gui(object):
         '''
         Initialize jinja template engine and defines URL routings.
         '''
-        log.info('start initializing ...')
         self.__sodocu = sodocu
         # needed for testing
         self.__endpoint = None
@@ -59,7 +58,6 @@ class Gui(object):
             Rule('/<item_type>/', endpoint='item_list'),
             Rule('/<item_type>/<item_id>', endpoint='single_item')
         ])
-        log.debug('end initializing ...')
 
 
     def dispatch_request(self, request):
@@ -264,7 +262,6 @@ def create_gui(sodocu, with_static=True):
     Factory method for creating a new instance of Gui. Configuration of static
     content locations is situated here too.
     '''
-    log.info('start creating ...')
     gui = Gui(sodocu)
     if with_static:
         gui.wsgi_app = SharedDataMiddleware(gui.wsgi_app, {
@@ -273,7 +270,6 @@ def create_gui(sodocu, with_static=True):
             '/img':   os.path.join(os.path.dirname(__file__), '../../web/img'),
             '/fonts': os.path.join(os.path.dirname(__file__), '../../web/fonts')
         })
-    log.info('end creating ...')
 #     return gui
     # @see: http://werkzeug.pocoo.org/docs/debug/
     return DebuggedApplication(gui, evalex=True)
