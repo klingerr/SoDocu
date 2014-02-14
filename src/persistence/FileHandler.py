@@ -44,8 +44,11 @@ class FileHandler(object):
 
     def delete_file(self, item):
         log.debug('deleting file: ' + item.get_filename())
-        os.remove(item.get_filename())
-        
+        try:
+            os.remove(item.get_filename())
+        except OSError:
+            log.warn('Could not delete file ' + item.get_filename())
+            
 
     def create_directory(self, item):
         item_type = self.get_config().get_item_type(item.__class__.__name__.lower())

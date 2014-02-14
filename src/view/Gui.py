@@ -158,6 +158,9 @@ class Gui(object):
             return Response(request.form['value'])
         elif request.method == 'DELETE':
             log.debug('request.method: DELETE')
+            self.get_sodocu().delete_item(item_id)
+            # JavaScript delete method requires text response "success" for removing table row
+            return Response('success', mimetype='text/plain')
         else:
             log.debug('request.method: UNKNOWN')
             

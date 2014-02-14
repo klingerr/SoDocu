@@ -91,6 +91,20 @@ class SoDocu(object):
         self.get_file_handler().update_file(item)
         
         
+    def delete_item(self, item_id):
+        item = self.get_item_by_id(item_id)
+        self.get_file_handler().delete_file(item)
+        self.remove_item(item)
+        
+
+    def remove_item(self, item):
+        for idea in self.get_ideas():
+            if idea.get_id() == item.get_id():
+                log.debug('remove item: ' + idea.get_id()) 
+                self.get_ideas().remove(idea)
+                break
+
+
 if __name__ == '__main__':
     logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
     log.info('starting ...')
