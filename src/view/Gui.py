@@ -111,7 +111,8 @@ class Gui(object):
             get_items_method = self.get_get_items_method(item_type)
             return self.render_template('ideas_table.html', 
                                         items=self.fetch_items(get_items_method), 
-                                        item_type=item_type)
+                                        item_type=item_type,
+                                        valid_item_types=self.get_sodocu().get_config().get_item_types())
         elif request.method == 'POST':
             log.debug('request.method: POST')
 #             short_id = self.insert_url(url)
@@ -180,7 +181,8 @@ class Gui(object):
             else:
                 short_id = self.insert_url(url)
                 return redirect('/%s+' % short_id)
-        return self.render_template('new_url.html', error=error, url=url)
+        return self.render_template('new_url.html', error=error, url=url,
+                                    valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
     def is_valid_url(self, url):

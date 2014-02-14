@@ -27,7 +27,11 @@ class SoDocu(object):
         self.__path = config.get_sodocu_path()
         self.__fileHandler = FileHandler(self.__path)
         self.__ideas = set()
+        self.__config = config
         self.read_all_items()
+
+    def get_config(self):
+        return self.__config
 
 
     def get_path(self):
@@ -48,6 +52,7 @@ class SoDocu(object):
     path = property(get_path, None, None, None)
     fileHandler = property(get_file_handler, None, None, None)
     ideas = property(get_ideas, None, None, None)
+    config = property(get_config, None, None, None)
 
         
     def read_all_items(self):
