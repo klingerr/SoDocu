@@ -5,6 +5,10 @@ Created on 31.01.2014
 '''
 
 import os
+import logging
+
+log = logging.getLogger(__name__)
+
 
 class DirectoryWalker(object):
     '''
@@ -37,7 +41,7 @@ class DirectoryWalker(object):
     def find_all_files(self):
         for root, dirs, files in os.walk(self.get_sodocu_path()):
             for myFile in files:
-#                 print os.path.abspath(os.path.join(root, myFile))
+                log.debug('found file: ' + os.path.abspath(os.path.join(root, myFile)))
                 if myFile.endswith(self.file_extension):
                     self.add_filename(os.path.abspath(os.path.join(root, myFile)))
 

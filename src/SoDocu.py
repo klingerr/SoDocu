@@ -4,17 +4,15 @@ Created on 03.02.2014
 @author: RKlinger
 '''
 
-import os
 import logging.config
+import os
+
+from src.model.Idea import Idea, create_idea
 from src.persistence.DirectoryWalker import DirectoryWalker
 from src.persistence.FileHandler import FileHandler
-from src.model.Idea import Idea, create_idea
 from src.view.Gui import create_gui
 
 log = logging.getLogger('SoDocu')
-# console logger
-# log.addHandler(logging.StreamHandler())
-# log.setLevel(logging.DEBUG)
 
 
 class SoDocu(object):
@@ -26,6 +24,7 @@ class SoDocu(object):
         '''
         Reads all items into memory.
         '''
+        log.info('starting ...')
         self.__path = os.path.abspath(path)
         self.__fileHandler = FileHandler(self.__path)
         self.__ideas = set()
@@ -84,12 +83,15 @@ class SoDocu(object):
 
 
     def save_item(self, item):
-        self.get_file_handler().w
+        self.get_file_handler().update_file(item)
+        
         
 if __name__ == '__main__':
-    logging.config.fileConfig('logging.conf')
-
-    from werkzeug.serving import run_simple
+    logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+    
     sodoku = SoDocu("../sodocu")
     gui = create_gui(sodoku)
-    run_simple('127.0.0.1', 8080, gui, use_debugger=True, use_reloader=True)
+    
+    from werkzeug.serving import run_simple
+    log.info('starting web server ..')
+    run_simple('127.0.0.1', 80, gui, use_debugger=True, use_reloader=True)

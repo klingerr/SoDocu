@@ -14,8 +14,8 @@ class TestDirectoryWalker(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.project_root_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir))
-        self.directoryWalker = DirectoryWalker(self.project_root_path + '/sodocu')
+        self.project_sodocu_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir))
+        self.directoryWalker = DirectoryWalker(self.project_sodocu_path + '/sodocu')
  
  
     @classmethod 

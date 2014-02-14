@@ -3,9 +3,15 @@ Created on 03.02.2014
 
 @author: RKlinger
 '''
+import logging
+
 from AbstractItem import AbstractItem
 from MetaData import MetaData, merge_meta_config
 from Stakeholder import Stakeholder
+
+
+log = logging.getLogger(__name__)
+
 
 class Idea(AbstractItem, MetaData):
     '''
@@ -29,6 +35,7 @@ class Idea(AbstractItem, MetaData):
         if isinstance(value, Stakeholder):
             self.__inventedBy = value
         else:
+            log.warn('InventedBy must be a stakeholder!')
             raise Exception('InventedBy must be a stakeholder!')
         
     inventedBy = property(get_invented_by, set_invented_by, None, None)

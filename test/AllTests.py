@@ -6,8 +6,7 @@ Created on 11.02.2014
 import unittest
 import logging.config
 
-
-logging.config.fileConfig('logging.conf')
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
 
 if __name__ == '__main__':

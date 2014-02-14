@@ -1,35 +1,61 @@
 <!doctype html>
 <title>{% block title %}{% endblock %} | SoDocu</title>
 <link rel="shortcut icon" href="/img/favicon.ico"  type="image/x-icon" />
-<link rel="stylesheet" href="/css/style.css" type="text/css" />
+
+<!-- Bootstrap -->
+<link href="/css/bootstrap.css" rel="stylesheet">
+<link href="/css/bootstrap-theme.css" rel="stylesheet">
+<link href="/css/dashboard.css" rel="stylesheet">
+<link href="/css/sticky-footer.css" rel="stylesheet">
+ <!-- @see: https://github.com/Jowin/Datatables-Bootstrap3 -->
+<link href="/css/bootstrap.datatables.css" rel="stylesheet">
+    
+<script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
+
 <!-- DataTables with jEdit-Plugin for inline table editing 
-@see http://www.dzone.com/links/r/creating_perfect_tables_with_datatables_and_jedit.html
-@see http://datatables.net/examples/api/editable.html
---> 
-<link href="/css/table.css" media="screen" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="/js/jquery.min.js"></script>
+@see: http://www.dzone.com/links/r/creating_perfect_tables_with_datatables_and_jedit.html
+@see: http://datatables.net/examples/api/editable.html
+@see: http://www.appelsiini.net/projects/jeditable
+-->
 <script type="text/javascript" src="/js/jquery.datatables.js"></script>
 <script type="text/javascript" src="/js/jquery.jeditable.js"></script>
+
 <script type="text/javascript" src="/js/autogrow.min.js"></script>
 <script type="text/javascript" src="/js/jquery.jeditable.autogrow.js"></script>
+
 <script type="text/javascript" src="/js/jquery.blockui.js"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/docs.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.datatables.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+	
+	/* DataTable initialisation */
 	var table = $("#items");
-	var oTable = table.dataTable({"sPaginationType": "full_numbers", 
-		"bStateSave": true,
-		"aaSorting": [[ 1, "desc" ]]
+	var oTable = table.dataTable({
+/* 		"bStateSave": true,
+		"aaSorting": [[ 0, "asc" ]],  */
+     /* "sPaginationType": {"bs_normal", "bs_two_button", "bs_four_button", "bs_full"}  */
+		"sPaginationType": "bs_normal",
+		"aoColumnDefs": [{ "sType": "string", "aTargets": [0] }]
 	});
 
-	$(".editable", oTable.fnGetNodes()).editable("/item/", {
+	$(".editable", oTable.fnGetNodes()).editable("", {
 		method: "PUT",
+        tooltip: "Click to edit",
 		"callback": function(sValue, y) {
 			var fetch = sValue.split(",");
 			var aPos = oTable.fnGetPosition(this);
-			oTable.fnUpdate(fetch[1], aPos[0], aPos[1]);
+			/* oTable.fnUpdate(fetch[1], aPos[0], aPos[1]); */
+            oTable.fnUpdate(sValue, aPos[0], aPos[1]);
+            /* Redraw the table from the new data on the server */
+            /* oTable.fnClearTable(); */
+            oTable.fnDraw(); 
 		},
 		"submitdata": function(value, settings) {
-			settings.target = "/item/" + this.parentNode.getAttribute("id");
+			var itemType = window.location.href.split( '/' )[3]
+			/* update the request URL */
+			settings.target = "/" + itemType + "/" + this.parentNode.getAttribute("id");
 			return {
 				"id": this.parentNode.getAttribute("id"),
 				"attribute": $('#items th').eq($(this).index()).attr('id')
@@ -54,8 +80,9 @@ $(document).ready(function() {
             oTable.fnDraw(); 
 		},
 		"submitdata": function(value, settings) {
+			var itemType = window.location.href.split( '/' )[3]
 			/* update the request URL */
-			settings.target = "/item/" + this.parentNode.getAttribute("id");
+			settings.target = "/" + itemType + "/" + this.parentNode.getAttribute("id");
 			return {
 				"id": this.parentNode.getAttribute("id"),
 				"attribute": $('#items th').eq($(this).index()).attr('id')
@@ -67,9 +94,10 @@ $(document).ready(function() {
 	$(document).on("click", ".delete", function() {
 		var item_id = this.parentNode.parentNode.getAttribute("id");
 		var parent = $("#"+item_id);
+		var itemType = window.location.href.split( '/' )[3]
 		$.ajax({
 			type: "DELETE",
-			url: "/item/"+item_id,
+			url: "/" + itemType + "/" + item_id,
 			data: "",
 			beforeSend: function() {
 				table.block({
@@ -97,10 +125,94 @@ $(document).ready(function() {
 		});
 	});
 });
+
+$.extend( $.fn.dataTableExt.oStdClasses, {
+    "sWrapper": "dataTables_wrapper form-inline"
+});
+
 </script>
  
-<div class=box>
-  <h1><a href=/>SoDocu</a></h1>
-  <p class=tagline>Software Documentation
-  {% block body %}{% endblock %}
-</div>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/" title="Software Documentation">SoDocu</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">Overview</a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#">Export</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">Nav item</a></li>
+            <li><a href="">Nav item again</a></li>
+            <li><a href="">One more nav</a></li>
+            <li><a href="">Another nav item</a></li>
+            <li><a href="">More navigation</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">Nav item again</a></li>
+            <li><a href="">One more nav</a></li>
+            <li><a href="">Another nav item</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">Dashboard</h1>
+
+          <div class="row placeholders">
+            <div class="col-xs-6 col-sm-3 placeholder">
+              <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
+            </div>
+            <div class="col-xs-6 col-sm-3 placeholder">
+              <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
+            </div>
+            <div class="col-xs-6 col-sm-3 placeholder">
+              <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
+            </div>
+            <div class="col-xs-6 col-sm-3 placeholder">
+              <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
+            </div>
+          </div>
+{% block body %}{% endblock %}
+       </div>
+      </div>
+    </div>
+    
+ <!--     
+	<div id="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </div>
+ -->    

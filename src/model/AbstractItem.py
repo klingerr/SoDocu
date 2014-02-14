@@ -45,7 +45,7 @@ class AbstractItem(object):
     def set_filename(self, value):
         self.__filename = value
 
-    def get_basename(self):
+    def get_camel_case_name(self):
         '''
         Returns the basename of the file made off the "camel cased" name.
         '''
