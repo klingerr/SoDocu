@@ -15,7 +15,8 @@ from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import SharedDataMiddleware
-from src.utils.Utils import new_line_to_br
+from src.utils.Utils import new_line_to_br, get_max_id
+from src.model.Idea import Idea
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class Gui(object):
     HTTP 
     Method URI                               Action
     GET    http://[hostname]/item/           Retrieve list of items
-    GET    http://[hostname]/item/[item_id]  Retrieve a item
+    GET    http://[hostname]/item/[item_id]  Retrieve a single item
     POST   http://[hostname]/item/           Create a new item
     PUT    http://[hostname]/item/[item_id]  Update an existing item
     DELETE http://[hostname]/item/[item_id]  Delete a item
@@ -115,8 +116,9 @@ class Gui(object):
                                         valid_item_types=self.get_sodocu().get_config().get_item_types())
         elif request.method == 'POST':
             log.debug('request.method: POST')
-#             short_id = self.insert_url(url)
-#             return redirect('/%s+' % short_id)
+            return self.render_template('idea_new.html', 
+                                        identifier='idea-' + str(get_max_id(self.get_sodocu().get_ideas()) + 1),
+                                        valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
     def on_single_item(self, request, item_type, item_id):
@@ -126,8 +128,8 @@ class Gui(object):
         On request type DELETE deletes the of specified item.
         '''
         log.debug('on_single_item(request, ' + item_type + ', ' + item_id + ')')
-        # TODO: configurable item types
-        if item_type not in ['idea', 'stakeholder']:
+        log.debug('valid item types: ' + str(self.get_sodocu().get_config().get_item_types_as_string()))
+        if item_type not in self.get_sodocu().get_config().get_item_types_as_string():
             log.warn('Unknown item type: ' + item_type)
             raise NotFound()
         
@@ -139,23 +141,10 @@ class Gui(object):
             pass
         elif self.is_put_request(request):
             log.debug('request.method: PUT')
-            log.debug("request.form['id']: " + request.form['id'])
-            
-            if item_id != request.form['id']:
-                raise MethodNotAllowed(description='URL and form data do not match!')
-            
-            attribute = request.form['attribute']
-            log.debug("attribute: " + attribute)
-            
-            item = self.get_sodocu().get_item_by_id(item_id)
-            log.debug("item: " + str(item))
-            
-            self.get_sodocu().set_attribut(item, attribute, request.form['value'])
-            self.get_sodocu().save_item(item)
-            
-            # jEditable requires submited data as return value for updating table
-            # @see: https://www.datatables.net/forums/discussion/8365/jeditable-datatables-how-can-i-refresh-table-after-edit 
-            return Response(request.form['value'])
+            if self.is_single_attribute_update(request):
+                return self.update_single_attribute(request, item_id)
+            else:
+                return self.update_item(request, item_type, item_id)
         elif request.method == 'DELETE':
             log.debug('request.method: DELETE')
             self.get_sodocu().delete_item(item_id)
@@ -163,11 +152,45 @@ class Gui(object):
             return Response('success', mimetype='text/plain')
         else:
             log.debug('request.method: UNKNOWN')
-            
     
+    
+    def update_single_attribute(self, request, item_id):
+        log.debug('update_single_attribute(' + str(request) + ', ' + item_id + ')')
+        log.debug("request.form['id']: " + request.form['id'])
+        
+        if item_id != request.form['id']:
+            raise MethodNotAllowed(description='URL and form data do not match!')
+        
+        attribute = request.form['attribute']
+        log.debug("attribute: " + attribute)
+        
+        item = self.get_sodocu().get_item_by_id(item_id)
+        log.debug("item: " + str(item))
+        
+        self.get_sodocu().set_attribut(item, attribute, request.form['value'])
+        self.get_sodocu().save_item(item)
+        
+        # jEditable requires submited data as return value for updating table
+        # @see: https://www.datatables.net/forums/discussion/8365/jeditable-datatables-how-can-i-refresh-table-after-edit 
+        return Response(request.form['value'])
+    
+    
+    def update_item(self, request, item_type, item_id):
+        log.debug('update_item(' + str(request) + ', ' + item_id + ')')
+        idea = Idea(item_id, request.form['name'])
+        idea.set_description(request.form['description'])
+        self.get_sodocu().save_item(idea)
+        self.get_sodocu().add_idea(idea)
+        return redirect('/%s/' % item_type)
+        
+        
     def is_put_request(self, request):
         return (request.method == 'PUT') or (request.method == 'POST' and request.form['_method'].upper() == 'PUT')
-                                             
+                      
+                      
+    def is_single_attribute_update(self, request):
+        return 'attribute' in request.form
+                            
     
     def on_new_url(self, request):
         '''
@@ -182,8 +205,7 @@ class Gui(object):
             if not self.is_valid_url(url):
                 error = 'Please enter a valid URL'
             else:
-                short_id = self.insert_url(url)
-                return redirect('/%s+' % short_id)
+                return redirect('/%s+' % 'short_id')
         return self.render_template('new_url.html', error=error, url=url,
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
@@ -191,48 +213,6 @@ class Gui(object):
     def is_valid_url(self, url):
         parts = urlparse.urlparse(url)
         return parts.scheme in ('http', 'https')
-
-
-    def on_follow_short_link(self, request, short_id):
-        '''
-        This method is called when requesting the extended URL, 
-        i.e. http://localhost/foo.
-        '''
-        know_urls = {'bla':'http://google.de'}
-        link_target = know_urls[short_id]
-        if link_target is None:
-            raise NotFound()
-        return redirect(link_target)
-
-
-    def on_short_link_details(self, request, short_id):
-        '''
-        This method is called when requesting the extended URL including 
-        details, i.e. http://localhost/foo+.
-        '''
-        know_urls = {'bla':'http://google.de'}
-        link_target = know_urls[short_id]
-        if link_target is None:
-            raise NotFound()
-        click_count = 42
-        return self.render_template('short_link_details.html',
-            link_target=link_target,
-            short_id=short_id,
-            click_count=click_count
-        )
-
-
-    def on_short_link_table(self, request, short_id):
-        '''
-        This method is called when requesting the extended URL including 
-        table view, i.e. http://localhost/foo*.
-        '''
-        if short_id != 'ideas':
-            raise NotFound()
-        return self.render_template('ideas_table.html',
-            sodocu=self.get_sodocu(),
-            short_id=short_id
-        )
 
 
     def render_template(self, template_name, **context):
@@ -256,7 +236,6 @@ class Gui(object):
 
     def get_endpoint(self):
         return self.__endpoint
-
 
     sodocu = property(get_sodocu, None, None, None)
     endpoint = property(get_endpoint, None, None, None)

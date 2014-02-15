@@ -34,8 +34,10 @@ class FileHandler(object):
 
     def update_file(self, item):
         log.debug('item.get_camel_case_name(): ' + item.get_camel_case_name())
-        log.debug('get_file_basename(item.get_filename()): ' + get_file_basename(item.get_filename()))
-        if item.get_camel_case_name() != get_file_basename(item.get_filename()):
+        log.debug('get_file_basename(item.get_filename()): ' + str(get_file_basename(item.get_filename())))
+        if get_file_basename(item.get_filename()) is None:
+            self.create_file(item)
+        elif item.get_camel_case_name() != get_file_basename(item.get_filename()):
             self.delete_file(item)
             self.create_file(item)
         else:
@@ -88,5 +90,5 @@ def read_file(filename):
     log.debug('reading file: ' + filename)
     dataset = config.read(filename)
     if len(dataset) == 0:
-        raise ValueError, "File not found!"
+        raise ValueError("File not found!")
     return config

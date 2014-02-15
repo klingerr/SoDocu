@@ -43,4 +43,18 @@ TODO
 # Usage
 TODO
 
+# TODOs
+* menu position of item type configurable
+* edit existing items
+* creating further item types
+* make logic dynamicly depending on item type
+* use glossary entries for dynamic tooltips in web gui
+* eat your own dog food - create sodocu items
+* text search despite of item type
+* fill relations between items
+* dashboard shown missing relations
+* graphical models for requirements (UML), targets (mind map) and system context (SysML)
+* dependency between model and item
+* graphical visualization of relations
+
 Enjoy using SoDocu.

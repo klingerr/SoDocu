@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block title %}New Idea{% endblock %}
+{% block body %}
+  <h2>Create new idea</h2>
+  <form action="/idea/{{ identifier }}" method="post">
+
+<!-- for creating a PUT request -->
+  	<input type="hidden" name="_method" value="put" />
+
+  	
+    {% if error %}
+      <p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+    
+    <div class="table-responsive">  
+  		<table class="table table-striped table-hover">
+		    <tr>
+		      <td>id</td>
+		      <td>{{ identifier }}</td>
+		    </tr>
+		    <tr>
+		      <td>name</td>
+		      <td><input type="text" name="name" value=""></td>
+		    </tr>
+		    <tr>
+		      <td>description</td>
+		      <td><textarea name="description" cols="60" rows="7"></textarea></td>
+		    </tr>
+		    <tr>
+		      <td colspan="2"><b>Relations</b></td>
+		    </tr>
+		    <tr>
+		      <td>invented by (stakeholder)</td>
+		      <td>
+				<select name="stakeholder" size="1">
+			      <option value="None"></option>
+			      <option value="stakeholder-1">Developer</option>
+			      <option value="stakeholder-2">Tester</option>
+			    </select>
+   		      </td>
+		    </tr>
+		    <tr>
+		      <td>grouped by (topic)</td>
+		      <td>
+				<select name="topic" size="1">
+			      <option value="None"></option>
+			      <option value="topic-1">Persistence</option>
+			      <option value="topic-2">Stakeholder Analysis</option>
+			    </select>
+   		      </td>
+		    </tr>
+		    <tr>
+		      <td>specified by (user story)</td>
+		      <td>
+				<select name="userStory" size="1">
+			      <option value="None"></option>
+			      <option value="userStory-1">bla</option>
+			      <option value="userStory-2">bli</option>
+			    </select>
+   		      </td>
+		    </tr>
+ 	    </table>
+	</div>
+    
+    <input type="submit" value="Save" class="btn btn-primary btn-sm" />
+    <a href="/idea/">Cancel</a>
+  </form>
+{% endblock %}

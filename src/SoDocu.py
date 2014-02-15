@@ -25,7 +25,7 @@ class SoDocu(object):
         Reads all items into memory.
         '''
         self.__path = config.get_sodocu_path()
-        self.__fileHandler = FileHandler(self.__path)
+        self.__fileHandler = FileHandler(config)
         self.__ideas = set()
         self.__config = config
         self.read_all_items()
@@ -48,7 +48,7 @@ class SoDocu(object):
 
     def add_idea(self, value):
         self.__ideas.add(value)
-
+        
     path = property(get_path, None, None, None)
     fileHandler = property(get_file_handler, None, None, None)
     ideas = property(get_ideas, None, None, None)

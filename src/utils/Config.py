@@ -23,7 +23,7 @@ class Config(object):
         '''
         Reads the current configuration from sodocu.json. 
         '''
-        self.__sodocu_path = '../sodocu/'
+        self.__sodocu_path = None
         # set of unique item types
         self.__item_types = set()
         self.read_config()
@@ -51,7 +51,7 @@ class Config(object):
     def get_item_types_as_string(self):
         item_type_strings = set()
         for item_type in self.get_item_types():
-            item_type_strings.add(str(item_type))
+            item_type_strings.add(item_type.get_name())
         return item_type_strings
         
 
@@ -72,8 +72,12 @@ class Config(object):
  
     def read_config(self):
         self.clear_item_types()
-        config = read_file(os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir)) + '/sodocu.conf')
-        self.set_sodocu_path(config.get('main', 'path'))
+        project_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir))
+#         print project_path
+        conf_file = os.path.join(project_path, 'sodocu.conf')
+#         print conf_file
+        config = read_file(conf_file)
+        self.set_sodocu_path(os.path.join(project_path, config.get('main', 'path')))
         
         for section in config.sections():
             if section != 'main':

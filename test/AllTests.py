@@ -12,7 +12,7 @@ import nose
 
 
 if __name__ == '__main__':
-    nose.config.Config.verbosity = 5
+    nose.config.Config().configureLogging()
     result = nose.run()
 #     print result
     

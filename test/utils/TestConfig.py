@@ -20,7 +20,8 @@ class Test(unittest.TestCase):
 
 
     def test_get_sodocu_path(self):
-        assert 'sodocu' in self.config.get_sodocu_path()
+        print self.config.get_sodocu_path()
+        assert 'SoDocu/./sodocu' in self.config.get_sodocu_path()
         
 
     def test_is_valid_item_type_valid(self):
@@ -43,12 +44,12 @@ class Test(unittest.TestCase):
     def test_read_config(self):
         self.config.read_config()
         assert self.config.is_valid_item_type('document')
-         
+    
+    
+    def test_get_item_types_as_string(self):
+        assert 'idea' in self.config.get_item_types_as_string()
+        
  
-#     def test_read_config(self):
-#         self.config.read_config()
-
-
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

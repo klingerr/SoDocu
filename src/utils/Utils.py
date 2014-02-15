@@ -17,9 +17,11 @@ def make_camel_case(text):
 
 def get_file_basename(path):
     log.debug('path: ' + str(path)) 
-    head, tail = ntpath.split(path)
-    filename = tail or ntpath.basename(head)
-    return os.path.splitext(filename)[0]
+    if path is not None:
+        head, tail = ntpath.split(path)
+        filename = tail or ntpath.basename(head)
+        return os.path.splitext(filename)[0]
+    return None
 
 
 def new_line_to_br(value):
@@ -28,4 +30,15 @@ def new_line_to_br(value):
     '''
     return value.replace("\n", "<br />")
 
+
+def get_max_id(abstract_items):
+    if len(abstract_items) == 0:
+        return 0
+    
+    identifier = 0
+    for abstract_item in abstract_items:
+        number = abstract_item.get_id().split('-')[1]
+        if int(number) > int(identifier):
+            identifier = int(number)
+    return identifier
     
