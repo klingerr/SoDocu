@@ -52,7 +52,7 @@ class FileHandler(object):
 
     def create_directory(self, item):
         item_type = self.get_config().get_item_type(item.__class__.__name__.lower())
-        directory = self.get_config().get_sodocu_path() + item_type.get_path()
+        directory = os.path.join(self.get_config().get_sodocu_path(), item_type.get_path())
         log.debug('directory: ' + directory)
         if not os.path.exists(directory):
             log.info(directory + ' does not exists. Creating a new one.')
