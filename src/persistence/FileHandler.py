@@ -27,30 +27,35 @@ class FileHandler(object):
     def create_file(self, item):
         filename = item.get_camel_case_name() + self.file_extension
         directory = self.create_directory(item)
-        item.set_filename(directory + '/' + filename)
-        log.debug('writing file: ' + item.get_filename())
-        self.write_file(item)
+        if directory is not None:
+            item.set_filename(directory + '/' + filename)
+            log.debug('writing file: ' + item.get_filename())
+            return self.write_file(item)
+        return False
 
 
     def update_file(self, item):
         log.debug('item.get_camel_case_name(): ' + item.get_camel_case_name())
         log.debug('get_file_basename(item.get_filename()): ' + str(get_file_basename(item.get_filename())))
         if get_file_basename(item.get_filename()) is None:
-            self.create_file(item)
+            return self.create_file(item)
         elif item.get_camel_case_name() != get_file_basename(item.get_filename()):
-            self.delete_file(item)
-            self.create_file(item)
+            if self.delete_file(item):
+                return self.create_file(item)
+            return False
         else:
-            self.write_file(item)
+            return self.write_file(item)
 
 
     def delete_file(self, item):
         log.debug('deleting file: ' + item.get_filename())
         try:
             os.remove(item.get_filename())
+            return True
         except OSError:
             log.warn('Could not delete file ' + item.get_filename())
-            
+        return False
+
 
     def create_directory(self, item):
         item_type = self.get_config().get_item_type(item.__class__.__name__.lower())
@@ -68,11 +73,12 @@ class FileHandler(object):
             cfgfile = open(item.get_filename(), 'w')
             try:
                 config.write(cfgfile)
+                return True
             finally:
                 cfgfile.close()
-        
         except IOError:
             log.warn("Error: can\'t find file or read data")
+        return False
 
 
     def get_config(self):

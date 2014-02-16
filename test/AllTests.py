@@ -1,4 +1,7 @@
 '''
+run at console:
+nosetests --with-coverage --cover-package=../src/ --cover-inclusive --cover-html --cover-erase
+
 Created on 11.02.2014
 
 @author: RKlinger

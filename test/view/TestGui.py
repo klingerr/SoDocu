@@ -62,16 +62,48 @@ class TestGui(unittest.TestCase):
         assert str(self.gui.get_endpoint()) == 'single_item'
 
         
-    def test_get_get_items_method_gt_ideas(self):
-        get_items_method = self.gui.get_get_items_method('idea')
-#         print get_items_method
-        assert get_items_method == self.sodoku.get_ideas
+    def test_is_put_request_get(self):
+        builder = EnvironBuilder(method='GET')
+        env = builder.get_environ()
+        request = Request(env)
+        assert not self.gui.is_put_request(request)
         
 
-    def test_get_get_items_method_exception(self):
-        with self.assertRaises(Exception):
-            self.gui.get_get_items_method('unknown')
+    def test_is_put_request_put(self):
+        builder = EnvironBuilder(method='PUT')
+        env = builder.get_environ()
+        request = Request(env)
+        assert self.gui.is_put_request(request)
+        
 
+    def test_is_put_request_post_method_put(self):
+        builder = EnvironBuilder(method='POST', data={'_method': 'put'})
+        env = builder.get_environ()
+        request = Request(env)
+        assert self.gui.is_put_request(request)
+        
+
+    def test_is_single_attribute_update_success(self):
+        builder = EnvironBuilder(method='POST', data={'attribute': 'bla'})
+        env = builder.get_environ()
+        request = Request(env)
+        assert self.gui.is_single_attribute_update(request)
+        
+
+    def test_is_single_attribute_update_failure(self):
+        builder = EnvironBuilder(method='POST', data={'bla': 'bla'})
+        env = builder.get_environ()
+        request = Request(env)
+        assert not self.gui.is_single_attribute_update(request)
+    
+    
+    def _test_is_valid_item_type_valid(self):
+        assert self.gui.is_valid_item_type('idea')
+        
+
+    def _test_is_valid_item_type_invalid(self):
+        assert not self.gui.is_valid_item_type('bla')
+        
 
 #     def test_fetch_items(self):
 #         get_items_method = self.gui.get_get_items_method('idea')

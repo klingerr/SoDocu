@@ -64,7 +64,7 @@ class Gui(object):
     def dispatch_request(self, request):
         '''
         Dispatcher for incoming URLs which uses the routing table defined in 
-        constructor.
+        constructor, sets prefix 'on_' to the specified endpoint as called method name.
         '''
         log.debug('dispatch_request(' + str(request) + ')')
         adapter = self.url_map.bind_to_environ(request.environ)
@@ -76,26 +76,22 @@ class Gui(object):
             return e
 
 
-    def get_get_items_method(self, item_type):
+    def on_new_url(self, request):
         '''
-        Returns the correct getter method for given item type.
+        This method is called when requesting the base URL, 
+        i.e. http://localhost/.
         '''
-        if hasattr(self.get_sodocu(), 'get_' + str(item_type) + 's'):
-            log.debug('getter_method: get_' + str(item_type) + 's')
-            getter_method = getattr(self.get_sodocu(), 'get_' + str(item_type) + 's')
-            log.debug('getter_method: ' + str(getter_method))
-            return getter_method
-        else:
-            log.warn('Sodocu has no method get_' + str(item_type) + 's!')
-            raise NotFound()
-
-
-    def fetch_items(self, get_items_method):
-        '''
-        Returns a set of all items by colling the given getter method.
-        '''
-        log.debug('get_items_method: ' + str(get_items_method))
-        return get_items_method()
+        log.debug('on_new_url(' + str(request) + ')')
+        error = None
+        url = ''
+        if request.method == 'POST':
+            url = request.form['url']
+            if not self.is_valid_url(url):
+                error = 'Please enter a valid URL'
+            else:
+                return redirect('/%s+' % 'short_id')
+        return self.render_template('new_url.html', error=error, url=url,
+                                    valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
     def on_item_list(self, request, item_type):
@@ -104,21 +100,13 @@ class Gui(object):
         On request type POST creates a new item of specified type.
         '''
         log.debug('on_item_list(request, ' + item_type + ')')
-        if item_type not in ['item', 'idea', 'bla']:
-            raise NotFound()
-        
+        self.check_valid_item_type(item_type)
         if request.method == 'GET':
             log.debug('request.method: GET')
-            get_items_method = self.get_get_items_method(item_type)
-            return self.render_template('ideas_table.html', 
-                                        items=self.fetch_items(get_items_method), 
-                                        item_type=item_type,
-                                        valid_item_types=self.get_sodocu().get_config().get_item_types())
+            return self.render_all_item_as_table(item_type)
         elif request.method == 'POST':
             log.debug('request.method: POST')
-            return self.render_template('idea_new.html', 
-                                        identifier='idea-' + str(get_max_id(self.get_sodocu().get_ideas()) + 1),
-                                        valid_item_types=self.get_sodocu().get_config().get_item_types())
+            return self.render_new_item_as_form(item_type)
 
 
     def on_single_item(self, request, item_type, item_id):
@@ -128,17 +116,10 @@ class Gui(object):
         On request type DELETE deletes the of specified item.
         '''
         log.debug('on_single_item(request, ' + item_type + ', ' + item_id + ')')
-        log.debug('valid item types: ' + str(self.get_sodocu().get_config().get_item_types_as_string()))
-        if item_type not in self.get_sodocu().get_config().get_item_types_as_string():
-            log.warn('Unknown item type: ' + item_type)
-            raise NotFound()
-        
+        self.check_valid_item_type(item_type)
         if request.method == 'GET':
             log.debug('request.method: GET')
-#             return self.render_template('ideas_table.html', 
-#                                         sodocu=self.get_sodocu(), 
-#                                         short_id=item_type)
-            pass
+            # TODO
         elif self.is_put_request(request):
             log.debug('request.method: PUT')
             if self.is_single_attribute_update(request):
@@ -147,13 +128,39 @@ class Gui(object):
                 return self.update_item(request, item_type, item_id)
         elif request.method == 'DELETE':
             log.debug('request.method: DELETE')
-            self.get_sodocu().delete_item(item_id)
+            self.get_sodocu().delete_item(item_type, item_id)
             # JavaScript delete method requires text response "success" for removing table row
             return Response('success', mimetype='text/plain')
         else:
             log.debug('request.method: UNKNOWN')
     
     
+    def check_valid_item_type(self, item_type):
+        if self.is_valid_item_type(item_type):
+            log.warn('Unknown item type: ' + item_type)
+            raise NotFound()
+
+
+    def render_all_item_as_table(self, item_type):
+        return self.render_template(item_type + '_table.html', 
+                                    items=self.sodocu.get_items(item_type), 
+                                    item_type=item_type,
+                                    valid_item_types=self.get_sodocu().get_config().get_item_types())
+
+
+    def render_new_item_as_form(self, item_type):
+        new_id = get_max_id(self.sodocu.get_items(item_type)) + 1
+        return self.render_template(item_type + '_new.html', 
+                                    identifier=item_type + '-' + str(new_id),
+                                    valid_item_types=self.get_sodocu().get_config().get_item_types())
+
+
+    def render_one_item_as_form(self, item_type, item_id):
+        return self.render_template(item_type + '_new.html', 
+                                    item=self.sodocu.get_item_by_id(item_type, item_id),
+                                    valid_item_types=self.get_sodocu().get_config().get_item_types())
+
+
     def update_single_attribute(self, request, item_id):
         log.debug('update_single_attribute(' + str(request) + ', ' + item_id + ')')
         log.debug("request.form['id']: " + request.form['id'])
@@ -174,7 +181,7 @@ class Gui(object):
         # @see: https://www.datatables.net/forums/discussion/8365/jeditable-datatables-how-can-i-refresh-table-after-edit 
         return Response(request.form['value'])
     
-    
+    # TODO dynamic item type
     def update_item(self, request, item_type, item_id):
         log.debug('update_item(' + str(request) + ', ' + item_id + ')')
         idea = Idea(item_id, request.form['name'])
@@ -182,8 +189,13 @@ class Gui(object):
         self.get_sodocu().save_item(idea)
         self.get_sodocu().add_idea(idea)
         return redirect('/%s/' % item_type)
-        
-        
+
+
+    def is_valid_item_type(self, item_type):
+        log.debug('valid item types: ' + str(self.get_sodocu().get_config().get_item_types_as_string()))
+        return item_type not in self.get_sodocu().get_config().get_item_types_as_string()
+    
+    
     def is_put_request(self, request):
         return (request.method == 'PUT') or (request.method == 'POST' and request.form['_method'].upper() == 'PUT')
                       
@@ -192,24 +204,6 @@ class Gui(object):
         return 'attribute' in request.form
                             
     
-    def on_new_url(self, request):
-        '''
-        This method is called when requesting the base URL, 
-        i.e. http://localhost/.
-        '''
-        log.debug('on_new_url(' + str(request) + ')')
-        error = None
-        url = ''
-        if request.method == 'POST':
-            url = request.form['url']
-            if not self.is_valid_url(url):
-                error = 'Please enter a valid URL'
-            else:
-                return redirect('/%s+' % 'short_id')
-        return self.render_template('new_url.html', error=error, url=url,
-                                    valid_item_types=self.get_sodocu().get_config().get_item_types())
-
-
     def is_valid_url(self, url):
         parts = urlparse.urlparse(url)
         return parts.scheme in ('http', 'https')

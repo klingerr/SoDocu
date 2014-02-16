@@ -53,8 +53,9 @@ class Idea(AbstractItem, MetaData):
         return 'Idea {' + AbstractItem.__str__(self) + MetaData.__str__(self) + '}' 
 
 
-def create_idea(config):
+def create_idea(config, filename):
     idea = Idea(config.get('idea', 'id'), config.get('idea', 'name'))
+    idea.set_filename(filename)
     idea.set_description(config.get('idea', 'description'))
 #     idea.set_invented_by(config.get('idea', 'inventedBy'))
     idea.set_created_by(config.get('meta', 'created_by'))
