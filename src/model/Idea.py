@@ -51,15 +51,3 @@ class Idea(AbstractItem, MetaData):
 
     def __str__(self):
         return 'Idea {' + AbstractItem.__str__(self) + MetaData.__str__(self) + '}' 
-
-
-def create_idea(config, filename):
-    idea = Idea(config.get('idea', 'id'), config.get('idea', 'name'))
-    idea.set_filename(filename)
-    idea.set_description(config.get('idea', 'description'))
-#     idea.set_invented_by(config.get('idea', 'inventedBy'))
-    idea.set_created_by(config.get('meta', 'created_by'))
-    idea.set_created_at(config.get('meta', 'created_at'))
-    idea.set_changed_by(config.get('meta', 'changed_by'))
-    idea.set_changed_at(config.get('meta', 'changed_at'))
-    return idea

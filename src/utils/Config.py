@@ -12,7 +12,9 @@ from src.utils.ItemType import ItemType
 
 # @see: http://pymotw.com/2/json/
 log = logging.getLogger(__name__)
-
+# console logger
+# log.addHandler(logging.StreamHandler())
+# log.setLevel(logging.DEBUG)
 
 class Config(object):
     '''
@@ -52,6 +54,7 @@ class Config(object):
         item_type_strings = set()
         for item_type in self.get_item_types():
             item_type_strings.add(item_type.get_name())
+        log.debug('item_type_strings: ' + str(item_type_strings))
         return item_type_strings
         
 

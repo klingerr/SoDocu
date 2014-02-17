@@ -6,7 +6,6 @@ Created on 04.02.2014
 
 import logging
 import os
-import urlparse
 
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.debug import DebuggedApplication
@@ -15,10 +14,12 @@ from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import SharedDataMiddleware
-from src.utils.Utils import new_line_to_br, get_max_id
-from src.model.Idea import Idea
+from src.utils.Utils import new_line_to_br, get_max_id, create_base_item
 
 log = logging.getLogger(__name__)
+# console logger
+# log.addHandler(logging.StreamHandler())
+# log.setLevel(logging.DEBUG)
 
 
 class Gui(object):
@@ -83,14 +84,7 @@ class Gui(object):
         '''
         log.debug('on_new_url(' + str(request) + ')')
         error = None
-        url = ''
-        if request.method == 'POST':
-            url = request.form['url']
-            if not self.is_valid_url(url):
-                error = 'Please enter a valid URL'
-            else:
-                return redirect('/%s+' % 'short_id')
-        return self.render_template('new_url.html', error=error, url=url,
+        return self.render_template('new_url.html', error=error, url='http://localhost',
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
@@ -119,13 +113,13 @@ class Gui(object):
         self.check_valid_item_type(item_type)
         if request.method == 'GET':
             log.debug('request.method: GET')
-            # TODO
+            # TODO get_single_item, render form
         elif self.is_put_request(request):
             log.debug('request.method: PUT')
             if self.is_single_attribute_update(request):
                 return self.update_single_attribute(request, item_id)
             else:
-                return self.update_item(request, item_type, item_id)
+                return self.create_or_update_item(request, item_type, item_id)
         elif request.method == 'DELETE':
             log.debug('request.method: DELETE')
             self.get_sodocu().delete_item(item_type, item_id)
@@ -136,9 +130,10 @@ class Gui(object):
     
     
     def check_valid_item_type(self, item_type):
-        if self.is_valid_item_type(item_type):
+        if not self.is_valid_item_type(item_type):
             log.warn('Unknown item type: ' + item_type)
             raise NotFound()
+        return True
 
 
     def render_all_item_as_table(self, item_type):
@@ -163,37 +158,59 @@ class Gui(object):
 
     def update_single_attribute(self, request, item_id):
         log.debug('update_single_attribute(' + str(request) + ', ' + item_id + ')')
-        log.debug("request.form['id']: " + request.form['id'])
         
         if item_id != request.form['id']:
             raise MethodNotAllowed(description='URL and form data do not match!')
         
-        attribute = request.form['attribute']
-        log.debug("attribute: " + attribute)
-        
         item = self.get_sodocu().get_item_by_id(item_id)
+        attribute = request.form['attribute']
+        value = request.form['value']
         log.debug("item: " + str(item))
+        log.debug("attribute: " + attribute)
+        log.debug("value: " + value)
         
-        self.get_sodocu().set_attribut(item, attribute, request.form['value'])
+        self.get_sodocu().set_attribut(item, attribute, value)
         self.get_sodocu().save_item(item)
         
         # jEditable requires submited data as return value for updating table
         # @see: https://www.datatables.net/forums/discussion/8365/jeditable-datatables-how-can-i-refresh-table-after-edit 
         return Response(request.form['value'])
     
-    # TODO dynamic item type
-    def update_item(self, request, item_type, item_id):
-        log.debug('update_item(' + str(request) + ', ' + item_id + ')')
-        idea = Idea(item_id, request.form['name'])
-        idea.set_description(request.form['description'])
-        self.get_sodocu().save_item(idea)
-        self.get_sodocu().add_idea(idea)
+    
+    def create_or_update_item(self, request, item_type, item_id):
+        log.debug('create_or_update_item(' + str(request) + ', ' + item_type + ', ' + item_id+ ')')
+        item = self.sodocu.get_item_by_id(item_type, item_id)
+        log.debug('item: ' + str(item))
+        if item is not None:
+            self.update_item(request, item)
+            self.get_sodocu().save_item(item)
+        else:
+            new_item = create_base_item(item_type, item_id, request.form['name'])
+            self.update_item(request, new_item)
+            if new_item is not None:
+                self.get_sodocu().add_item(new_item)
+                self.get_sodocu().save_item(new_item)
+
         return redirect('/%s/' % item_type)
+
+
+    def update_item(self, request, item):
+        '''
+        Updates all item attributes by given form args. 
+        '''
+        log.debug('update_item(' + str(request) + ', ' + str(item) + ')')
+        for key in request.form:
+            try:
+                setter_method = getattr(item, 'set_' + key)
+                log.debug('setter_method: ' + str(setter_method))
+                setter_method(''.join(request.form.getlist(key)))
+            except AttributeError:
+                log.info('Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
 
 
     def is_valid_item_type(self, item_type):
         log.debug('valid item types: ' + str(self.get_sodocu().get_config().get_item_types_as_string()))
-        return item_type not in self.get_sodocu().get_config().get_item_types_as_string()
+        return item_type in self.get_sodocu().get_config().get_item_types_as_string()
     
     
     def is_put_request(self, request):
@@ -204,11 +221,6 @@ class Gui(object):
         return 'attribute' in request.form
                             
     
-    def is_valid_url(self, url):
-        parts = urlparse.urlparse(url)
-        return parts.scheme in ('http', 'https')
-
-
     def render_template(self, template_name, **context):
         t = self.jinja_env.get_template(template_name)
         return Response(t.render(context), mimetype='text/html')

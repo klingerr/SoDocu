@@ -6,11 +6,11 @@ Created on 03.02.2014
 
 import logging.config
 
-from src.model.Idea import Idea, create_idea
 from src.persistence.DirectoryWalker import DirectoryWalker
 from src.persistence.FileHandler import FileHandler, read_file
-from src.view.Gui import create_gui
 from src.utils.Config import Config
+from src.utils.Utils import create_item
+from src.view.Gui import create_gui
 
 log = logging.getLogger('SoDocu')
 # console logger
@@ -30,7 +30,8 @@ class SoDocu(object):
         self.__config = sodocu_config
         self.__path = self.__config.get_sodocu_path()
         self.__fileHandler = FileHandler(self.__config)
-        self.__ideas = set()
+        # dictionary/map with item_type as key and set of items as value
+        self.__items = dict()
         self.read_all_items()
 
     def get_config(self):
@@ -45,16 +46,27 @@ class SoDocu(object):
         return self.__fileHandler
 
 
-    def get_ideas(self):
-        return self.__ideas
+    def get_items(self, item_type):
+        try:
+            return self.__items[item_type]
+        except KeyError:
+            log.info('There are no items of type <' + item_type + '>')
+        return None
 
 
-    def add_idea(self, value):
-        self.__ideas.add(value)
+    def add_item(self, item):
+        log.debug('add_item(' + str(item) + ')')
+        item_type = item.__class__.__name__.lower()
+        items = self.get_items(item_type)
+        if items is None:
+            self.__items[item_type] = set()
+            items = self.get_items(item_type)
+        items.add(item)
+
         
     path = property(get_path, None, None, None)
     fileHandler = property(get_file_handler, None, None, None)
-    ideas = property(get_ideas, None, None, None)
+    items = property(get_items, None, None, None)
     config = property(get_config, None, None, None)
 
         
@@ -64,15 +76,12 @@ class SoDocu(object):
         log.debug('directoryWalker.get_filenames(): ' + str(directoryWalker.get_filenames()))
         for filename in directoryWalker.get_filenames():
             item_config = read_file(filename)
-            item = self.create_item(item_config, filename)
-            if isinstance(item, Idea):
-                self.add_idea(item)
+            item = create_item(item_config, filename)
+            self.add_item(item)
 
 
     def set_attribut(self, item, attribute, value):
-        log.debug('item: ' + str(item))
-        log.debug('attribute: ' + attribute)
-        log.debug('value: ' + value)
+        log.debug('set_attribut: ' + str(item) + ', ' + attribute + ', ' + value + ')')
         setter_method = getattr(item, 'set_' + attribute)
         log.debug('setter_method: ' + str(setter_method))
         setter_method(value)
@@ -80,36 +89,14 @@ class SoDocu(object):
 
     def get_item_by_id(self, item_type, identifier):
         log.debug('get_item_by_id(: ' + item_type + ', ' + identifier + ')') 
-        for item in self.get_items(item_type):
+        items = self.get_items(item_type)
+        if items is None:
+            return None
+        
+        for item in items:
             log.debug('item.get_id: ' + item.get_id()) 
             if item.get_id() == identifier:
                 return item
-
-
-    def get_items(self, item_type):
-        log.debug('get_items(: ' + item_type + ')')
-        getter_method = self.get_get_items_method(item_type)
-        return getter_method()
-
-
-    def get_get_items_method(self, item_type):
-        '''
-        Returns the correct getter method for given item type.
-        '''
-        if hasattr(self, 'get_' + str(item_type) + 's'):
-            log.debug('getter_method: get_' + str(item_type) + 's')
-            getter_method = getattr(self, 'get_' + str(item_type) + 's')
-            log.debug('getter_method: ' + str(getter_method))
-            return getter_method
-        else:
-            log.warn('Sodocu has no method get_' + str(item_type) + 's!')
-            return None
-
-
-    # TODO dynamic item type
-    def create_item(self, item_config, filename):
-        if 'idea' in item_config.sections():
-            return create_idea(item_config, filename)
 
 
     def save_item(self, item):
@@ -123,13 +110,20 @@ class SoDocu(object):
         return False
         
 
-    # TODO dynamic item type
     def remove_item(self, item):
-        for idea in self.get_ideas():
-            if idea.get_id() == item.get_id():
-                log.debug('remove item: ' + idea.get_id()) 
-                self.get_ideas().remove(idea)
-                return True
+        '''
+        Removes the given item from set of item_types
+        '''
+        item_type = item.__class__.__name__.lower()
+        items = self.get_items(item_type)
+        if items is None:
+            return False
+        
+        try:
+            items.remove(item)
+            return True
+        except KeyError:
+            log.info('There is no item <' + item.get_id() + '> to remove!')
         return False
 
 

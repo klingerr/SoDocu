@@ -44,10 +44,14 @@ TODO
 TODO
 
 # TODOs
+* save current user in cookie
+* automatic saving of created/changed by/at 
 * menu position of item type configurable
+* template for lists and single item configurable
+* dialog for confirming item delete
 * edit existing items
 * creating further item types
-* make logic dynamicly depending on item type
+* ~~make logic dynamicly depending on item type~~
 * use glossary entries for dynamic tooltips in web gui
 * eat your own dog food - create sodocu items
 * text search despite of item type

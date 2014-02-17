@@ -70,7 +70,19 @@ class AbstractItem(object):
         config.set(section_name, 'name', self.get_name())
         config.set(section_name, 'description', self.get_description() if hasattr(self, 'description') else '')
         return config        
+    
 
     def __eq__(self, other):
+        '''
+        Together with __hash__ method necessary for object identity in a set.
+        '''
 #         return self.__dict__ == other.__dict__
         return self.get_id() == other.get_id()
+
+
+    def __hash__(self):
+        '''
+        Together with __eq__ method necessary for object identity in a set.
+        '''
+        return hash(self.get_id())
+    

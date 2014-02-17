@@ -42,7 +42,7 @@ class DirectoryWalker(object):
         for root, dirs, files in os.walk(self.get_sodocu_path()):
             for myFile in files:
                 log.debug('found file: ' + os.path.abspath(os.path.join(root, myFile)))
-                if myFile.endswith(self.file_extension):
+                if myFile.endswith(self.file_extension) and not myFile.startswith('glossary'):
                     self.add_filename(os.path.abspath(os.path.join(root, myFile)))
 
 

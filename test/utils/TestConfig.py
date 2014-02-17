@@ -3,6 +3,7 @@ Created on 14.02.2014
 
 @author: RKlinger
 '''
+import os
 import unittest
 from src.utils.Config import Config
 
@@ -21,7 +22,7 @@ class Test(unittest.TestCase):
 
     def test_get_sodocu_path(self):
         print self.config.get_sodocu_path()
-        assert 'SoDocu/./sodocu' in self.config.get_sodocu_path()
+        assert 'SoDocu' + os.sep + './sodocu' in self.config.get_sodocu_path()
         
 
     def test_is_valid_item_type_valid(self):
@@ -47,6 +48,7 @@ class Test(unittest.TestCase):
     
     
     def test_get_item_types_as_string(self):
+        print self.config.get_item_types_as_string()
         assert 'idea' in self.config.get_item_types_as_string()
         
  
