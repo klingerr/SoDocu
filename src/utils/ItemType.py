@@ -9,10 +9,12 @@ class ItemType(object):
     Represents a valid item type in sodoku.
     '''
 
-    def __init__(self, name, path, menu_position):
+    def __init__(self, name, path):
         self.__name = name
         self.__path = path
-        self.__menu_position = menu_position
+        self.__menu_position = None
+        self.__form_template = None
+        self.__table_template = None
 
 
     def get_name(self):
@@ -27,9 +29,31 @@ class ItemType(object):
         return self.__menu_position
 
 
+    def get_form_template(self):
+        return self.__form_template
+
+
+    def get_table_template(self):
+        return self.__table_template
+
+
+    def set_menu_position(self, value):
+        self.__menu_position = value
+
+
+    def set_form_template(self, value):
+        self.__form_template = value
+
+
+    def set_table_template(self, value):
+        self.__table_template = value
+
+
     name = property(get_name, None, None, None)
     path = property(get_path, None, None, None)
-    menu_position = property(get_menu_position, None, None, None)
+    menu_position = property(get_menu_position, set_menu_position, None, None)
+    form_template = property(get_form_template, set_form_template, None, None)
+    table_template = property(get_table_template, set_table_template, None, None)
 
 
     def __str__(self):

@@ -47,7 +47,7 @@ TODO
 * ~~save current user in cookie~~
 * automatic saving of created/changed by/at 
 * ~~menu position of item type configurable~~
-* template for lists and single item configurable
+* ~~template for lists and single item configurable~~
 * ~~dialog for confirming item delete~~
 * edit existing items
 * creating further item types

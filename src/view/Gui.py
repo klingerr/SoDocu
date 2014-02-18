@@ -106,7 +106,7 @@ class Gui(object):
         On request type GET retrieves all items of specified type.
         On request type POST creates a new item of specified type.
         '''
-        log.debug('on_item_list(request, ' + item_type + ')')
+        log.debug('on_item_list(' + str(request) + ', ' + item_type + ')')
         self.check_valid_item_type(item_type)
         if request.method == 'GET':
             log.debug('request.method: GET')
@@ -143,6 +143,10 @@ class Gui(object):
     
     
     def on_user(self, request):
+        '''
+        On request type GET retrieves current username from cookie.
+        On request type POST saves given username as cookie.
+        '''
         log.debug('on_user(' + str(request) + ')')
         if request.method == 'GET':
             log.debug('request.method: GET')
@@ -183,7 +187,7 @@ class Gui(object):
 
 
     def render_all_item_as_table(self, item_type):
-        return self.render_template(item_type + '_table.html', 
+        return self.render_template(self.get_sodocu().get_config().get_item_type(item_type).get_table_template(), 
                                     items=self.sodocu.get_items(item_type), 
                                     item_type=item_type,
                                     user=self.get_user(),
@@ -192,15 +196,18 @@ class Gui(object):
 
     def render_new_item_as_form(self, item_type):
         new_id = get_max_id(self.sodocu.get_items(item_type)) + 1
-        return self.render_template(item_type + '_new.html', 
+        return self.render_template(self.get_sodocu().get_config().get_item_type(item_type).get_form_template(), 
                                     identifier=item_type + '-' + str(new_id),
+                                    item_type=item_type,
                                     user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
     def render_one_item_as_form(self, item_type, item_id):
-        return self.render_template(item_type + '_new.html', 
+        log.debug('render_one_item_as_form(' + item_type + ', ' + item_id + ')')
+        return self.render_template(self.get_sodocu().get_config().get_item_type(item_type).get_form_template(), 
                                     item=self.sodocu.get_item_by_id(item_type, item_id),
+                                    item_type=item_type,
                                     user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 

@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block title %}{{ item_type }}s{% endblock %}
+{% block body %}
+
+  <h1 class="page-header">Dashboard</h1>
+
+  <div class="row placeholders">
+    <div class="col-xs-6 col-sm-3 placeholder">
+      <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
+      <h4>Label</h4>
+      <span class="text-muted">Something else</span>
+    </div>
+    <div class="col-xs-6 col-sm-3 placeholder">
+      <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
+      <h4>Label</h4>
+      <span class="text-muted">Something else</span>
+    </div>
+    <div class="col-xs-6 col-sm-3 placeholder">
+      <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
+      <h4>Label</h4>
+      <span class="text-muted">Something else</span>
+    </div>
+  </div>
+
+  <h2>{{ item_type }}s</h2>
+  
+<!-- @see: http://getbootstrap.com/css/#tables -->
+<div class="table-responsive">  
+  <table class="table table-striped table-hover" id="items">
+    <thead>
+      <th>ID</th>
+      <th id="name">name</th>
+      <th id="description">description</th>
+      <th>created <br/> by / at</th>
+      <th>changed <br/> by / at</th>
+      <th></th>
+    </thead>
+    {%- for item in items %}
+    <tr id="{{ item.id }}">
+      <td>{{ item.id }}</td>
+      <td class="growable">{{ item.name }}</td>
+<!--  <td class="growable">{{ item.description|new_line_to_br|safe }}</td> -->
+      <td class="growable">{{ item.description|safe }}</td>
+      <td>{{ item.createdBy }} / {{ item.createdAt }}</td>
+      <td>{{ item.changedBy }} / {{ item.changedAt }}</td>
+      <td>
+		  <a href="javascript:;" class="delete btn btn-default btn-sm" role="button" title='delete "{{ item.id }}"'>      
+  			<span class="glyphicon glyphicon-remove"></span>
+  		  </a>
+	  </td>
+    </tr>
+    {%- endfor %}
+  </table>
+</div>
+
+{% endblock %}

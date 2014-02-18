@@ -31,8 +31,19 @@ class SoDocu(object):
         self.__path = self.__config.get_sodocu_path()
         self.__fileHandler = FileHandler(self.__config)
         # dictionary/map with item_type as key and set of items as value
-        self.__items = dict()
+        self.__items = self.initialize_items_dictionary()
         self.read_all_items()
+
+
+    def initialize_items_dictionary(self):
+        '''
+        Creates a dictionary with one key for each item type and an empty set as value.
+        '''
+        items = dict()
+        for item_type in self.get_config().get_item_types_as_string():
+            items[item_type] = set()
+        return items 
+
 
     def get_config(self):
         return self.__config
@@ -88,7 +99,7 @@ class SoDocu(object):
 
 
     def get_item_by_id(self, item_type, identifier):
-        log.debug('get_item_by_id(: ' + item_type + ', ' + identifier + ')') 
+        log.debug('get_item_by_id(' + str(item_type) + ', ' + str(identifier) + ')') 
         items = self.get_items(item_type)
         if items is None:
             return None

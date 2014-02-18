@@ -85,4 +85,9 @@ class Config(object):
         
         for section in config.sections():
             if section != 'main':
-                self.add_item_type(ItemType(section, config.get(section, 'path'), config.get(section, 'menu_position')))
+                item = ItemType(section, config.get(section, 'path'))
+                item.set_menu_position(config.get(section, 'menu_position'))
+                item.set_form_template(config.get(section, 'form_template'))
+                item.set_table_template(config.get(section, 'table_template'))
+                self.add_item_type(item)
+                
