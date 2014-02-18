@@ -27,6 +27,10 @@
 <script type="text/javascript" src="/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/docs.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap.datatables.js"></script>
+<!-- for delete confirmation dialog
+@see: http://bootboxjs.com/
+ -->
+<script type="text/javascript" src="/js/bootbox.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	
@@ -95,34 +99,42 @@ $(document).ready(function() {
 		var item_id = this.parentNode.parentNode.getAttribute("id");
 		var parent = $("#"+item_id);
 		var itemType = window.location.href.split( '/' )[3]
-		$.ajax({
-			type: "DELETE",
-			url: "/" + itemType + "/" + item_id,
-			data: "",
-			beforeSend: function() {
-				table.block({
-					message: "",
-					css: {
-						border: "none",
-						backgroundColor: "none"
+		// alert('item_id: ' + item_id)
+		
+		bootbox.confirm("Do you really want to delete '" + item_id + "'?", function(result) {
+			// alert('result: ' + result)
+			if(result == true){
+				// alert('result is true')
+				$.ajax({
+					type: "DELETE",
+					url: "/" + itemType + "/" + item_id,
+					data: "",
+					beforeSend: function() {
+						table.block({
+							message: "",
+							css: {
+								border: "none",
+								backgroundColor: "none"
+							},
+							overlayCSS: {
+								backgroundColor: "#fff",
+								opacity: "0.5",
+								cursor: "wait"
+							}
+						});
 					},
-					overlayCSS: {
-						backgroundColor: "#fff",
-						opacity: "0.5",
-						cursor: "wait"
+					success: function(response) {
+						table.unblock();
+						var get = response.split(",");
+						if(get[0] == "success") {
+							$(parent).fadeOut(200,function() {
+								$(parent).remove();
+							});
+						}
 					}
 				});
-			},
-			success: function(response) {
-				table.unblock();
-				var get = response.split(",");
-				if(get[0] == "success") {
-					$(parent).fadeOut(200,function() {
-						$(parent).remove();
-					});
-				}
 			}
-		});
+		}); 
 	});
 });
 

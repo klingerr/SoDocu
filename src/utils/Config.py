@@ -40,6 +40,7 @@ class Config(object):
 
 
     def get_item_types(self):
+        # @see: https://wiki.python.org/moin/HowTo/Sorting
         return sorted(list(self.__item_types), key=lambda item_type: item_type.menu_position)
 
 
