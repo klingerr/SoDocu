@@ -37,7 +37,7 @@
     </thead>
     {%- for item in items %}
     <tr id="{{ item.id }}">
-      <td>{{ item.id }}</td>
+      <td><a href="/{{ item_type }}/{{ item.id }}/" title='edit "{{ item.id }}"'>{{ item.id }}</a></td>
       <td class="growable">{{ item.name }}</td>
 <!--  <td class="growable">{{ item.description|new_line_to_br|safe }}</td> -->
       <td class="growable">{{ item.description|safe }}</td>

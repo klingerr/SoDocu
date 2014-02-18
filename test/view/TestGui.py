@@ -57,7 +57,7 @@ class TestGui(unittest.TestCase):
     @patch('src.view.Gui.Gui.on_single_item')        
     def test_dispatch_single_item(self, mocked_method):
         mocked_method.return_value = None
-        builder = EnvironBuilder(path='/item/idea-99')
+        builder = EnvironBuilder(path='/item/idea-99/')
         env = builder.get_environ()
         request = Request(env)
 #         print 'request: ' + str(request)

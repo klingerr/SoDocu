@@ -62,7 +62,7 @@ class Gui(object):
         self.url_map = Map([
             Rule('/', endpoint='new_url'),
             Rule('/<item_type>/', endpoint='item_list'),
-            Rule('/<item_type>/<item_id>', endpoint='single_item'),
+            Rule('/<item_type>/<item_id>/', endpoint='single_item'),
             # special URL for entering or changing current username
             Rule('/user/', endpoint='user'),
             # special URL for searching over all items
@@ -126,7 +126,8 @@ class Gui(object):
         self.check_valid_item_type(item_type)
         if request.method == 'GET':
             log.debug('request.method: GET')
-            # TODO get_single_item, render form
+            item = self.sodocu.get_item_by_id(item_type, item_id)
+            return self.render_one_item_as_form(item_type, item)
         elif self.is_put_request(request):
             log.debug('request.method: PUT')
             if self.is_single_attribute_update(request):
@@ -195,18 +196,15 @@ class Gui(object):
 
 
     def render_new_item_as_form(self, item_type):
-        new_id = get_max_id(self.sodocu.get_items(item_type)) + 1
-        return self.render_template(self.get_sodocu().get_config().get_item_type(item_type).get_form_template(), 
-                                    identifier=item_type + '-' + str(new_id),
-                                    item_type=item_type,
-                                    user=self.get_user(),
-                                    valid_item_types=self.get_sodocu().get_config().get_item_types())
+        new_id = item_type + '-' + str(get_max_id(self.sodocu.get_items(item_type)) + 1)
+        temp_item = create_base_item(item_type, new_id, '')
+        return self.render_one_item_as_form(item_type, temp_item)
 
 
-    def render_one_item_as_form(self, item_type, item_id):
-        log.debug('render_one_item_as_form(' + item_type + ', ' + item_id + ')')
+    def render_one_item_as_form(self, item_type, item):
+        log.debug('render_one_item_as_form(' + item_type + ', ' + str(item) + ')')
         return self.render_template(self.get_sodocu().get_config().get_item_type(item_type).get_form_template(), 
-                                    item=self.sodocu.get_item_by_id(item_type, item_id),
+                                    item=item,
                                     item_type=item_type,
                                     user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
@@ -244,6 +242,8 @@ class Gui(object):
         log.debug('item: ' + str(item))
         if item is not None:
             self.update_item(request, item)
+            item.set_changed_by(self.get_user())
+            item.set_changed_now()
             self.get_sodocu().save_item(item)
         else:
             new_item = create_base_item(item_type, item_id, request.form['name'])

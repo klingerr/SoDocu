@@ -86,7 +86,7 @@ $(document).ready(function() {
 		"submitdata": function(value, settings) {
 			var itemType = window.location.href.split( '/' )[3]
 			/* update the request URL */
-			settings.target = "/" + itemType + "/" + this.parentNode.getAttribute("id");
+			settings.target = "/" + itemType + "/" + this.parentNode.getAttribute("id") + "/";
 			return {
 				"id": this.parentNode.getAttribute("id"),
 				"attribute": $('#items th').eq($(this).index()).attr('id')

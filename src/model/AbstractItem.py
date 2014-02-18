@@ -18,7 +18,7 @@ class AbstractItem(object):
         '''
         self.__id = identity
         self.__name = name
-        self.__description = None
+        self.__description = ''
         self.__filename = None
 
     def get_id(self):
