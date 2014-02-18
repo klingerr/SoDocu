@@ -23,6 +23,9 @@ log = logging.getLogger(__name__)
 
 
 class Gui(object):
+    COOKIE_NAME = 'sudocu_user'
+    COOKIE_MAX_AGE = 365 * 24 * 60 * 60 # 1 year
+    
     '''
     Class for web gui following REST style:
     HTTP 
@@ -45,6 +48,7 @@ class Gui(object):
         self.__sodocu = sodocu
         # needed for testing
         self.__endpoint = None
+        self.__user = None
         
         # initialize jinja template engine
         template_path = os.path.join(os.path.dirname(__file__), '../../web/templates')
@@ -58,7 +62,11 @@ class Gui(object):
         self.url_map = Map([
             Rule('/', endpoint='new_url'),
             Rule('/<item_type>/', endpoint='item_list'),
-            Rule('/<item_type>/<item_id>', endpoint='single_item')
+            Rule('/<item_type>/<item_id>', endpoint='single_item'),
+            # special URL for entering or changing current username
+            Rule('/user/', endpoint='user'),
+            # special URL for searching over all items
+            Rule('/search/', endpoint='search')
         ])
 
 
@@ -83,8 +91,13 @@ class Gui(object):
         i.e. http://localhost/.
         '''
         log.debug('on_new_url(' + str(request) + ')')
+        if not self.exists_username(request):
+            return redirect('/user/')
         error = None
-        return self.render_template('new_url.html', error=error, url='http://localhost',
+        return self.render_template('new_url.html', 
+                                    error=error, 
+                                    url='http://localhost',
+                                    user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
@@ -129,6 +142,39 @@ class Gui(object):
             log.debug('request.method: UNKNOWN')
     
     
+    def on_user(self, request):
+        log.debug('on_user(' + str(request) + ')')
+        if request.method == 'GET':
+            log.debug('request.method: GET')
+            return self.render_template('user_form.html', 
+                                        user=self.get_user(),
+                                        valid_item_types=self.get_sodocu().get_config().get_item_types())
+        elif request.method == 'POST':
+            log.debug('request.method: POST')
+            self.set_user(request.form['user'])
+            response = redirect('/')  
+            response.set_cookie(Gui.COOKIE_NAME, self.get_user(), Gui.COOKIE_MAX_AGE)
+            return response  
+    
+    
+    def on_search(self, request):
+        pass
+    
+    
+    def exists_username(self, request):
+        '''
+        Reads browser coockie for saved username.
+        '''
+        log.debug('exists_username(' + str(request) + ')')
+        # @see: http://runnable.com/UqbOjvh9mtpcAACn/using-session-in-werkzeug-for-python
+        username = request.cookies.get(Gui.COOKIE_NAME)
+        log.debug('username: ' + str(username))
+        if username is None:
+            return False
+        self.set_user(username)
+        return True
+    
+    
     def check_valid_item_type(self, item_type):
         if not self.is_valid_item_type(item_type):
             log.warn('Unknown item type: ' + item_type)
@@ -140,6 +186,7 @@ class Gui(object):
         return self.render_template(item_type + '_table.html', 
                                     items=self.sodocu.get_items(item_type), 
                                     item_type=item_type,
+                                    user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
@@ -147,12 +194,14 @@ class Gui(object):
         new_id = get_max_id(self.sodocu.get_items(item_type)) + 1
         return self.render_template(item_type + '_new.html', 
                                     identifier=item_type + '-' + str(new_id),
+                                    user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
     def render_one_item_as_form(self, item_type, item_id):
         return self.render_template(item_type + '_new.html', 
                                     item=self.sodocu.get_item_by_id(item_type, item_id),
+                                    user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
@@ -243,8 +292,16 @@ class Gui(object):
     def get_endpoint(self):
         return self.__endpoint
 
+    def get_user(self):
+        return self.__user
+
+
+    def set_user(self, value):
+        self.__user = value
+
     sodocu = property(get_sodocu, None, None, None)
     endpoint = property(get_endpoint, None, None, None)
+    user = property(get_user, set_user, None, None)
 
 
 def create_gui(sodocu, with_static=True):
