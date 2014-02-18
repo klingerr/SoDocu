@@ -134,7 +134,7 @@ class TestGui(unittest.TestCase):
         env = builder.get_environ()
         request = Request(env)
                 
-        self.gui.update_single_attribute(request, 'idea-1')
+        self.gui.update_single_attribute(request, 'idea', 'idea-1')
         print idea.get_name()
         # assertion not possible because of mocking SoDocu
 #         assert idea.get_name() == 'updated name'
@@ -149,7 +149,7 @@ class TestGui(unittest.TestCase):
         request = Request(env)
                 
         with self.assertRaises(Exception):
-            self.gui.update_single_attribute(request, 'idea-1')
+            self.gui.update_single_attribute(request, 'idea', 'idea-1')
        
        
     def test_create_or_update_item_existing(self):
@@ -200,6 +200,9 @@ class TestGui(unittest.TestCase):
     @patch('src.view.Gui.Gui.check_valid_item_type')
     def test_on_single_item_put_attribute(self, mocked_check_valid_item_type):
         mocked_check_valid_item_type.return_value = True
+        idea = Idea('idea-1', 'idea-1')
+        self.sodocu.get_item_by_id.return_value = idea
+
         builder = EnvironBuilder(method='POST', data={'_method': 'put', 'id': 'idea-1', 'attribute':'name', 'value':'updated name'})
         env = builder.get_environ()
         request = Request(env)
@@ -229,7 +232,7 @@ class TestGui(unittest.TestCase):
         builder = EnvironBuilder(method='DELETE', data={'id': 'idea-1', 'name':'updated name'})
         env = builder.get_environ()
         request = Request(env)
-               
+        
         response = self.gui.on_single_item(request, 'idea', 'idea-1')
 #         print str(response)
 #         print str(redirect('/idea/'))

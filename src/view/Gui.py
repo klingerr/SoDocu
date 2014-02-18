@@ -122,7 +122,7 @@ class Gui(object):
         On request type PUT updates data of specified item.
         On request type DELETE deletes the of specified item.
         '''
-        log.debug('on_single_item(request, ' + item_type + ', ' + item_id + ')')
+        log.debug('on_single_item(' + str(request) + ', ' + item_type + ', ' + item_id + ')')
         self.check_valid_item_type(item_type)
         if request.method == 'GET':
             log.debug('request.method: GET')
@@ -130,7 +130,7 @@ class Gui(object):
         elif self.is_put_request(request):
             log.debug('request.method: PUT')
             if self.is_single_attribute_update(request):
-                return self.update_single_attribute(request, item_id)
+                return self.update_single_attribute(request, item_type, item_id)
             else:
                 return self.create_or_update_item(request, item_type, item_id)
         elif request.method == 'DELETE':
@@ -212,13 +212,16 @@ class Gui(object):
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
-    def update_single_attribute(self, request, item_id):
-        log.debug('update_single_attribute(' + str(request) + ', ' + item_id + ')')
+    def update_single_attribute(self, request, item_type, item_id):
+        log.debug('update_single_attribute(' + str(request) + ', ' + item_type + ', ' + item_id + ')')
         
         if item_id != request.form['id']:
             raise MethodNotAllowed(description='URL and form data do not match!')
         
-        item = self.get_sodocu().get_item_by_id(item_id)
+        item = self.get_sodocu().get_item_by_id(item_type, item_id)
+        if item is None:
+            raise NotFound()
+            
         attribute = request.form['attribute']
         value = request.form['value']
         log.debug("item: " + str(item))
@@ -226,6 +229,8 @@ class Gui(object):
         log.debug("value: " + value)
         
         self.get_sodocu().set_attribut(item, attribute, value)
+        item.set_changed_by(self.get_user())
+        item.set_changed_now()
         self.get_sodocu().save_item(item)
         
         # jEditable requires submited data as return value for updating table
@@ -242,6 +247,8 @@ class Gui(object):
             self.get_sodocu().save_item(item)
         else:
             new_item = create_base_item(item_type, item_id, request.form['name'])
+            new_item.set_created_by(self.get_user())
+            new_item.set_created_now()
             self.update_item(request, new_item)
             if new_item is not None:
                 self.get_sodocu().add_item(new_item)

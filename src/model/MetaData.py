@@ -11,6 +11,7 @@ class MetaData(object):
     '''
     Abstract class with common meta for all items.
     '''
+    TIME_FORMAT = "%d.%m.%Y %H:%M"
 
     def __init__(self):
         self.__createdBy = None
@@ -31,7 +32,7 @@ class MetaData(object):
         self.__createdAt = value
 
     def set_created_now(self):
-        self.__createdAt = datetime.datetime.now()
+        self.__createdAt = datetime.datetime.now().strftime(MetaData.TIME_FORMAT)
 
     def get_changed_by(self):
         return self.__changedBy
@@ -46,7 +47,7 @@ class MetaData(object):
         self.__changedAt = value
 
     def set_changed_now(self):
-        self.__changedAt = datetime.datetime.now()
+        self.__changedAt = datetime.datetime.now().strftime(MetaData.TIME_FORMAT)
 
     createdBy = property(get_created_by, set_created_by, None, None)
     createdAt = property(get_created_at, set_created_at, None, None)

@@ -99,14 +99,15 @@ class SoDocu(object):
 
 
     def get_item_by_id(self, item_type, identifier):
-        log.debug('get_item_by_id(' + str(item_type) + ', ' + str(identifier) + ')') 
+        log.debug('get_item_by_id(' + str(item_type) + ', ' + item_type + ', ' + str(identifier) + ')') 
         items = self.get_items(item_type)
         if items is None:
+            log.debug('item: ' + str(None)) 
             return None
         
         for item in items:
-            log.debug('item.get_id: ' + item.get_id()) 
             if item.get_id() == identifier:
+                log.debug('item: ' + str(item)) 
                 return item
 
 
