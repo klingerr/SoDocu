@@ -40,7 +40,7 @@ class Config(object):
 
 
     def get_item_types(self):
-        return self.__item_types
+        return sorted(list(self.__item_types), key=lambda item_type: item_type.menu_position)
 
 
     def add_item_type(self, item_type):
@@ -84,4 +84,4 @@ class Config(object):
         
         for section in config.sections():
             if section != 'main':
-                self.add_item_type(ItemType(section, config.get(section, 'path')))
+                self.add_item_type(ItemType(section, config.get(section, 'path'), config.get(section, 'menu_position')))

@@ -253,7 +253,7 @@ class TestGui(unittest.TestCase):
         mocked_check_valid_item_type.return_value = True
         mocked_render_template.return_value = True
         mocked_config = Mock(Config)
-        mocked_config.get_item_types.return_value = {ItemType('idea', './idea')}
+        mocked_config.get_item_types.return_value = {ItemType('idea', './idea', 1)}
         builder = EnvironBuilder(method='GET', path='/idea/')
         env = builder.get_environ()
         request = Request(env)

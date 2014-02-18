@@ -48,8 +48,15 @@ class Test(unittest.TestCase):
     
     
     def test_get_item_types_as_string(self):
-        print self.config.get_item_types_as_string()
+#         print self.config.get_item_types_as_string()
         assert 'idea' in self.config.get_item_types_as_string()
+        
+ 
+    def test_get_item_types(self):
+#        print self.config.get_item_types()
+        assert 'idea' == self.config.get_item_types()[0].get_name()
+        assert 'stakeholder' == self.config.get_item_types()[1].get_name()
+        assert 'document' == self.config.get_item_types()[2].get_name()
         
  
 if __name__ == "__main__":
