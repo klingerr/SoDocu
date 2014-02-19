@@ -57,7 +57,11 @@ class SoDocu(object):
         return self.__fileHandler
 
 
-    def get_items(self, item_type):
+    def get_items(self):
+        return self.__items
+
+
+    def get_items_by_type(self, item_type):
         try:
             return self.__items[item_type]
         except KeyError:
@@ -68,16 +72,16 @@ class SoDocu(object):
     def add_item(self, item):
         log.debug('add_item(' + str(item) + ')')
         item_type = item.__class__.__name__.lower()
-        items = self.get_items(item_type)
+        items = self.get_items_by_type(item_type)
         if items is None:
             self.__items[item_type] = set()
-            items = self.get_items(item_type)
+            items = self.get_items_by_type(item_type)
         items.add(item)
 
         
     path = property(get_path, None, None, None)
     fileHandler = property(get_file_handler, None, None, None)
-    items = property(get_items, None, None, None)
+    items = property(get_items_by_type, None, None, None)
     config = property(get_config, None, None, None)
 
         
@@ -100,7 +104,7 @@ class SoDocu(object):
 
     def get_item_by_id(self, item_type, identifier):
         log.debug('get_item_by_id(' + str(item_type) + ', ' + item_type + ', ' + str(identifier) + ')') 
-        items = self.get_items(item_type)
+        items = self.get_items_by_type(item_type)
         if items is None:
             log.debug('item: ' + str(None)) 
             return None
@@ -127,7 +131,7 @@ class SoDocu(object):
         Removes the given item from set of item_types
         '''
         item_type = item.__class__.__name__.lower()
-        items = self.get_items(item_type)
+        items = self.get_items_by_type(item_type)
         if items is None:
             return False
         
@@ -137,6 +141,15 @@ class SoDocu(object):
         except KeyError:
             log.info('There is no item <' + item.get_id() + '> to remove!')
         return False
+
+
+    def search(self, search_string):
+        results = set()
+        for key in self.get_items().keys():
+            for value in self.get_items_by_type(key):
+                if value.contains_text(search_string):
+                    results.add(value)
+        return results
 
 
 if __name__ == '__main__':

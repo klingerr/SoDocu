@@ -32,9 +32,11 @@ class TestGui(unittest.TestCase):
         self.gui = None
 
 
+    @patch('src.view.Gui.Gui.exists_username')        
     @patch('src.view.Gui.Gui.on_new_url')        
-    def test_dispatch_home_url(self, mocked_method):
+    def test_dispatch_home_url(self, mocked_method, mocked_exists_username):
         mocked_method.return_value = None
+        mocked_exists_username.return_value = True
         builder = EnvironBuilder(path='/')
         env = builder.get_environ()
         request = Request(env)
@@ -43,9 +45,11 @@ class TestGui(unittest.TestCase):
         assert str(self.gui.get_endpoint()) == 'new_url'
         
         
+    @patch('src.view.Gui.Gui.exists_username')        
     @patch('src.view.Gui.Gui.on_item_list')        
-    def test_dispatch_item_list(self, mocked_method):
+    def test_dispatch_item_list(self, mocked_method, mocked_exists_username):
         mocked_method.return_value = None
+        mocked_exists_username.return_value = True
         builder = EnvironBuilder(path='/item/')
         env = builder.get_environ()
         request = Request(env)
@@ -54,9 +58,11 @@ class TestGui(unittest.TestCase):
         assert str(self.gui.get_endpoint()) == 'item_list'
                 
         
+    @patch('src.view.Gui.Gui.exists_username')        
     @patch('src.view.Gui.Gui.on_single_item')        
-    def test_dispatch_single_item(self, mocked_method):
+    def test_dispatch_single_item(self, mocked_method, mocked_exists_username):
         mocked_method.return_value = None
+        mocked_exists_username.return_value = True
         builder = EnvironBuilder(path='/item/idea-99/')
         env = builder.get_environ()
         request = Request(env)
@@ -65,9 +71,11 @@ class TestGui(unittest.TestCase):
         assert str(self.gui.get_endpoint()) == 'single_item'
         
                 
+    @patch('src.view.Gui.Gui.exists_username')        
     @patch('src.view.Gui.Gui.on_user')        
-    def test_dispatch_user(self, mocked_method):
+    def test_dispatch_user(self, mocked_method, mocked_exists_username):
         mocked_method.return_value = None
+        mocked_exists_username.return_value = True
         builder = EnvironBuilder(path='/user/')
         env = builder.get_environ()
         request = Request(env)
@@ -76,9 +84,11 @@ class TestGui(unittest.TestCase):
         assert str(self.gui.get_endpoint()) == 'user'
         
                 
+    @patch('src.view.Gui.Gui.exists_username')        
     @patch('src.view.Gui.Gui.on_search')        
-    def test_dispatch_search(self, mocked_method):
+    def test_dispatch_search(self, mocked_method, mocked_exists_username):
         mocked_method.return_value = None
+        mocked_exists_username.return_value = True
         builder = EnvironBuilder(path='/search/')
         env = builder.get_environ()
         request = Request(env)

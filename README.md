@@ -54,11 +54,13 @@ TODO
 * ~~make logic dynamicly depending on item type~~
 * use glossary entries for dynamic tooltips in web gui
 * eat your own dog food - create sodocu items
-* full text search over all item types
+* ~~full text search over all item types~~
 * fill relations between items
 * dashboard shown known issues i.e.: missing relations
 * graphical models for requirements (UML), targets (mind map) and system context (SysML)
 * dependency between model and item
 * graphical visualization of relations
+* i18n
+* links between requirements and source code and tests
 
 Enjoy using SoDocu.

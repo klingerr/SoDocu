@@ -76,6 +76,8 @@ class Gui(object):
         constructor, sets prefix 'on_' to the specified endpoint as called method name.
         '''
         log.debug('dispatch_request(' + str(request) + ')')
+        if not self.exists_username(request):
+            return redirect('/user/')
         adapter = self.url_map.bind_to_environ(request.environ)
         try:
             endpoint, values = adapter.match()
@@ -91,8 +93,6 @@ class Gui(object):
         i.e. http://localhost/.
         '''
         log.debug('on_new_url(' + str(request) + ')')
-        if not self.exists_username(request):
-            return redirect('/user/')
         error = None
         return self.render_template('new_url.html', 
                                     error=error, 
@@ -110,7 +110,9 @@ class Gui(object):
         self.check_valid_item_type(item_type)
         if request.method == 'GET':
             log.debug('request.method: GET')
-            return self.render_all_item_as_table(item_type)
+            template = self.get_sodocu().get_config().get_item_type(item_type).get_table_template()
+            items = self.sodocu.get_items_by_type(item_type)
+            return self.render_all_item_as_table(template, item_type, items)
         elif request.method == 'POST':
             log.debug('request.method: POST')
             return self.render_new_item_as_form(item_type)
@@ -163,8 +165,12 @@ class Gui(object):
     
     
     def on_search(self, request):
-        pass
-    
+        log.debug('on_search(' + str(request) + ')')
+        if request.method == 'POST':
+            log.debug('request.method: POST')
+            search_results = self.sodocu.search(request.form['search_string'])
+            return self.render_all_item_as_table('generic_table.html', 'search result', search_results)
+      
     
     def exists_username(self, request):
         '''
@@ -187,16 +193,16 @@ class Gui(object):
         return True
 
 
-    def render_all_item_as_table(self, item_type):
-        return self.render_template(self.get_sodocu().get_config().get_item_type(item_type).get_table_template(), 
-                                    items=self.sodocu.get_items(item_type), 
+    def render_all_item_as_table(self, template, item_type, items):
+        return self.render_template(template, 
                                     item_type=item_type,
+                                    items=items, 
                                     user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
     def render_new_item_as_form(self, item_type):
-        new_id = item_type + '-' + str(get_max_id(self.sodocu.get_items(item_type)) + 1)
+        new_id = item_type + '-' + str(get_max_id(self.sodocu.get_items_by_type(item_type)) + 1)
         temp_item = create_base_item(item_type, new_id, '')
         return self.render_one_item_as_form(item_type, temp_item)
 

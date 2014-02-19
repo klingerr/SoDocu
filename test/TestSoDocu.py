@@ -70,25 +70,25 @@ class TestSoDocu(unittest.TestCase):
  
  
     def test_add_item(self):
-        self.sodocu.get_items('idea').clear()
+        self.sodocu.get_items_by_type('idea').clear()
         idea1 = Idea('idea-22', 'idea-22')
         self.sodocu.add_item(idea1)
-#         print self.sodocu.get_items('idea')
-        assert len(self.sodocu.get_items('idea')) == 1
+#         print self.sodocu.get_items_by_type('idea')
+        assert len(self.sodocu.get_items_by_type('idea')) == 1
         idea2 = Idea('idea-33', 'idea-33')
         self.sodocu.add_item(idea2)
-#         print self.sodocu.get_items('idea')
-        assert len(self.sodocu.get_items('idea')) == 2
+#         print self.sodocu.get_items_by_type('idea')
+        assert len(self.sodocu.get_items_by_type('idea')) == 2
         idea3 = Idea('idea-33', 'idea-33')
         self.sodocu.add_item(idea3)
-#         print self.sodocu.get_items('idea')
+#         print self.sodocu.get_items_by_type('idea')
 #         print idea2 == idea3
-        assert len(self.sodocu.get_items('idea')) == 2
+        assert len(self.sodocu.get_items_by_type('idea')) == 2
         self.sodocu.read_all_items()
         
          
     def test_remove_item(self):
-        self.sodocu.get_items('idea').clear()
+        self.sodocu.get_items_by_type('idea').clear()
         idea = Idea('idea-66', 'idea-66')
         assert not self.sodocu.remove_item(idea)
         stakeholder = Stakeholder('stakeholder-66', 'stakeholder-66')

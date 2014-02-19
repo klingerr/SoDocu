@@ -20,6 +20,7 @@ class AbstractItem(object):
         self.__name = name
         self.__description = ''
         self.__filename = None
+        self.__item_type = self.__class__.__name__.lower()
 
     def get_id(self):
         return self.__id
@@ -51,11 +52,23 @@ class AbstractItem(object):
         '''
         return make_camel_case(self.get_name())
 
+    def get_item_type(self):
+        return self.__item_type
+
     id = property(get_id, set_id, None, None)
     name = property(get_name, set_name, None, None)
     description = property(get_description, set_description, None, None)
     filename = property(get_filename, set_filename, None, None)
+    item_type = property(get_item_type, None, None, None)
 
+
+    def contains_text(self, text):
+        if text.lower() in self.get_id().lower() \
+        or text.lower() in self.get_name().lower() \
+        or text.lower() in self.get_description().lower():
+            return True
+        return False 
+        
     
     def __str__(self):
         return '[id=' + str(self.get_id()) + ', name=' + self.get_name() + ']' 
