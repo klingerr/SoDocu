@@ -4,6 +4,7 @@ Created on 14.02.2014
 @author: RKlinger
 '''
 import unittest
+import json
 
 from mock import Mock, patch
 from werkzeug.test import EnvironBuilder
@@ -97,6 +98,19 @@ class TestGui(unittest.TestCase):
         assert str(self.gui.get_endpoint()) == 'search'
         
                 
+    @patch('src.view.Gui.Gui.exists_username')        
+    @patch('src.view.Gui.Gui.on_search')        
+    def test_dispatch_json_glossary(self, mocked_method, mocked_exists_username):
+        mocked_method.return_value = None
+        mocked_exists_username.return_value = True
+        builder = EnvironBuilder(path='/glossary/json/')
+        env = builder.get_environ()
+        request = Request(env)
+#         print 'request: ' + str(request)
+        self.gui.dispatch_request(request)
+        assert str(self.gui.get_endpoint()) == 'json_glossary'
+        
+                
     def test_is_put_request_get(self):
         builder = EnvironBuilder(method='GET')
         env = builder.get_environ()
@@ -145,7 +159,7 @@ class TestGui(unittest.TestCase):
         request = Request(env)
                 
         self.gui.update_single_attribute(request, 'idea', 'idea-1')
-        print idea.get_name()
+#         print idea.get_name()
         # assertion not possible because of mocking SoDocu
 #         assert idea.get_name() == 'updated name'
        
@@ -178,7 +192,7 @@ class TestGui(unittest.TestCase):
       
     @patch('src.utils.Utils.create_item')
     def test_create_or_update_item_new(self, mocked_create_item):
-        print str(mocked_create_item)
+#         print str(mocked_create_item)
         idea = Idea('idea-1', 'idea-1')
         mocked_create_item.return_value = idea
                
@@ -313,6 +327,19 @@ class TestGui(unittest.TestCase):
 #         print self.gui.exists_username(request)
         assert not self.gui.exists_username(request)
 
+
+    @patch('src.view.Gui.Gui.check_valid_item_type')
+    def test_on_json_glossary(self, mocked_check_valid_item_type):
+        mocked_check_valid_item_type.return_value = True
+        self.sodocu.read_glossary_as_json.return_value = {"stakeholder":"person"}
+        
+        builder = EnvironBuilder(method='GET', path='/glossary/json/')
+        env = builder.get_environ()
+        request = Request(env)
+        
+        print str(self.gui.on_json_glossary(request).data)
+        assert 'stakeholder' in str(self.gui.on_json_glossary(request).data) 
+  
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

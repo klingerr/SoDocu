@@ -52,7 +52,8 @@ TODO
 * ~~edit existing items~~
 * creating further item types
 * ~~make logic dynamicly depending on item type~~
-* use glossary entries for dynamic tooltips in web gui
+* ~~use glossary entries for dynamic tooltips in web gui~~
+* editor for glossary entries
 * eat your own dog food - create sodocu items
 * ~~full text search over all item types~~
 * fill relations between items
@@ -62,5 +63,6 @@ TODO
 * graphical visualization of relations
 * i18n
 * links between requirements and source code and tests
+* export to pdf
 
 Enjoy using SoDocu.

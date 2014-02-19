@@ -9,8 +9,6 @@ import logging
 from src.persistence.FileHandler import read_file
 from src.utils.ItemType import ItemType
 
-
-# @see: http://pymotw.com/2/json/
 log = logging.getLogger(__name__)
 # console logger
 # log.addHandler(logging.StreamHandler())
@@ -28,8 +26,8 @@ class Config(object):
         self.__sodocu_path = None
         # set of unique item types
         self.__item_types = set()
+        self.__project_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir))
         self.read_config()
-
 
     def get_sodocu_path(self):
         return self.__sodocu_path
@@ -50,6 +48,11 @@ class Config(object):
 
     def clear_item_types(self):
         return self.__item_types.clear()
+    
+
+    def get_project_path(self):
+        return self.__project_path
+
 
     def get_item_types_as_string(self):
         item_type_strings = set()
@@ -76,18 +79,22 @@ class Config(object):
  
     def read_config(self):
         self.clear_item_types()
-        project_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir))
 #         print project_path
-        conf_file = os.path.join(project_path, 'sodocu.conf')
+        conf_file = os.path.join(self.get_project_path(), 'sodocu.conf')
 #         print conf_file
         config = read_file(conf_file)
-        self.set_sodocu_path(os.path.join(project_path, config.get('main', 'path')))
+        self.set_sodocu_path(os.path.join(self.get_project_path(), config.get('main', 'path')))
         
         for section in config.sections():
             if section != 'main':
-                item = ItemType(section, config.get(section, 'path'))
-                item.set_menu_position(config.get(section, 'menu_position'))
-                item.set_form_template(config.get(section, 'form_template'))
-                item.set_table_template(config.get(section, 'table_template'))
-                self.add_item_type(item)
+                item_type = ItemType(section, config.get(section, 'path'))
+                item_type.set_menu_position(config.get(section, 'menu_position'))
+                item_type.set_form_template(config.get(section, 'form_template'))
+                item_type.set_table_template(config.get(section, 'table_template'))
+                self.add_item_type(item_type)
+                
+                
+    sodocu_path = property(get_sodocu_path, set_sodocu_path, None, None)
+    item_types = property(get_item_types, None, None, None)
+    project_path = property(get_project_path, None, None, None)
                 

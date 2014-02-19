@@ -105,6 +105,9 @@ class TestSoDocu(unittest.TestCase):
         assert idea.get_id() == 'idea-55'
   
   
+    def test_read_glossary_as_json(self):
+        assert 'stakeholder' in str(self.sodocu.read_glossary_as_json())
+  
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

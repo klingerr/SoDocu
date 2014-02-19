@@ -9,8 +9,10 @@ import logging.config
 from src.persistence.DirectoryWalker import DirectoryWalker
 from src.persistence.FileHandler import FileHandler, read_file
 from src.utils.Config import Config
+from src.utils.Glossary import Glossary
 from src.utils.Utils import create_item
 from src.view.Gui import create_gui
+
 
 log = logging.getLogger('SoDocu')
 # console logger
@@ -27,6 +29,7 @@ class SoDocu(object):
         '''
         Reads all items into memory.
         '''
+        self.__glossary = Glossary()
         self.__config = sodocu_config
         self.__path = self.__config.get_sodocu_path()
         self.__fileHandler = FileHandler(self.__config)
@@ -43,6 +46,10 @@ class SoDocu(object):
         for item_type in self.get_config().get_item_types_as_string():
             items[item_type] = set()
         return items 
+
+
+    def get_glossary(self):
+        return self.__glossary
 
 
     def get_config(self):
@@ -79,13 +86,13 @@ class SoDocu(object):
         items.add(item)
 
         
+    glossary = property(get_glossary, None, None, None)
     path = property(get_path, None, None, None)
     fileHandler = property(get_file_handler, None, None, None)
     items = property(get_items_by_type, None, None, None)
     config = property(get_config, None, None, None)
 
         
-    # TODO dynamic item type
     def read_all_items(self):
         directoryWalker = DirectoryWalker(self.get_path())
         log.debug('directoryWalker.get_filenames(): ' + str(directoryWalker.get_filenames()))
@@ -151,6 +158,11 @@ class SoDocu(object):
                     results.add(value)
         return results
 
+
+    def read_glossary_as_json(self):
+        self.get_glossary().read_glossary(self.get_config().get_sodocu_path())
+        return self.get_glossary().get_entries_as_json()
+        
 
 if __name__ == '__main__':
     logging.config.fileConfig('logging.conf', disable_existing_loggers=False)

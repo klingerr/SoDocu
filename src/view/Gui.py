@@ -66,7 +66,9 @@ class Gui(object):
             # special URL for entering or changing current username
             Rule('/user/', endpoint='user'),
             # special URL for searching over all items
-            Rule('/search/', endpoint='search')
+            Rule('/search/', endpoint='search'),
+            # special URL for getting glossary entries as json data
+            Rule('/glossary/json/', endpoint='json_glossary')
         ])
 
 
@@ -171,6 +173,12 @@ class Gui(object):
             search_results = self.sodocu.search(request.form['search_string'])
             return self.render_all_item_as_table('generic_table.html', 'search result', search_results)
       
+    
+    def on_json_glossary(self, request):
+        log.debug('on_json_glossary(' + str(request) + ')')
+        if request.method == 'GET':
+            return Response(self.sodocu.read_glossary_as_json(), mimetype='application/json')
+    
     
     def exists_username(self, request):
         '''

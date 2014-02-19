@@ -3,13 +3,14 @@
 <link rel="shortcut icon" href="/img/favicon.ico"  type="image/x-icon" />
 
 <!-- Bootstrap -->
-<link href="/css/bootstrap.css" rel="stylesheet">
-<link href="/css/bootstrap-theme.css" rel="stylesheet">
-<link href="/css/dashboard.css" rel="stylesheet">
-<link href="/css/sticky-footer.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/bootstrap.css">
+<link rel="stylesheet" href="/css/bootstrap-theme.css">
+<link rel="stylesheet" href="/css/dashboard.css">
+<link rel="stylesheet" href="/css/sticky-footer.css">
  <!-- @see: https://github.com/Jowin/Datatables-Bootstrap3 -->
-<link href="/css/bootstrap.datatables.css" rel="stylesheet">
-    
+<link rel="stylesheet" href="/css/bootstrap.datatables.css">
+<link rel="stylesheet" href="/css/tooltip.css">
+      
 <script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
 
 <!-- DataTables with jEdit-Plugin for inline table editing 
@@ -31,6 +32,9 @@
 @see: http://bootboxjs.com/
  -->
 <script type="text/javascript" src="/js/bootbox.min.js"></script>
+<script type="text/javascript" src="/js/tooltip.js"></script>
+<script type="text/javascript" src="/js/jquery.glossarize.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function() {
 	
@@ -142,12 +146,26 @@ $.extend( $.fn.dataTableExt.oStdClasses, {
     "sWrapper": "dataTables_wrapper form-inline"
 });
 
+
 // pressing Enter-Button for full text search
 $("search_string").keypress(function(event) {
     if (event.which == 13) {
         event.preventDefault();
         $("search_form").submit();
     }
+});
+
+
+//tootips for glossary entries
+//@see: https://github.com/PebbleRoad/glossarizer
+$(function(){
+ $('.content').glossarizer({
+   sourceURL: '/glossary/json/',
+   lookupTagName : 'p, ul, td',
+   callback: function(){
+     new tooltip();
+   }
+ });
 });
 
 </script>
@@ -200,11 +218,13 @@ $("search_string").keypress(function(event) {
           </ul>
         </div>
         
-        
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <!-- necessary for glossary tooltips -->
+        <div class="content">
+          <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           
 {% block body %}{% endblock %}
 
+	     </div>
        </div>
       </div>
     </div>
@@ -216,4 +236,3 @@ $("search_string").keypress(function(event) {
       </div>
     </div>
  -->    
- 
