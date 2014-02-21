@@ -78,7 +78,7 @@ class Gui(object):
         constructor, sets prefix 'on_' to the specified endpoint as called method name.
         '''
         log.debug('dispatch_request(' + str(request) + ')')
-        if not self.exists_username(request):
+        if not self.exists_username(request) and request.path != '/user/':
             return redirect('/user/')
         adapter = self.url_map.bind_to_environ(request.environ)
         try:
