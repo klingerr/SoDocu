@@ -1,0 +1,11 @@
+[stakeholder]
+id = stakeholder-2
+name = Developer
+description = Developer
+
+[meta]
+created_by = rklinger
+created_at = 20.02.2014 15:35
+changed_by = None
+changed_at = None
+

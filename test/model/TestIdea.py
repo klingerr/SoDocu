@@ -4,16 +4,18 @@ Created on 03.02.2014
 @author: RKlinger
 '''
 import unittest
+
 from src.model.Idea import Idea
 from src.model.Stakeholder import Stakeholder
+from src.utils.ItemType import ItemType
 
 
 class TestIdea(unittest.TestCase):
     
     @classmethod
     def setUpClass(self):
-        self.idea = Idea(1, 'use Python language')
-        self.idea.set_created_by('rklinger')
+        self.idea = Idea(ItemType('idea', ''), 'idea-1', 'use Python language')
+        self.idea.get_meta_data().set_created_by('rklinger')
  
  
     @classmethod 
@@ -22,12 +24,12 @@ class TestIdea(unittest.TestCase):
 
 
     def test_create_idea(self):
-        self.idea.set_created_at('2014-02-03 13:33')
+        self.idea.get_meta_data().set_created_at('2014-02-03 13:33')
 #         self.idea.set_created_now()
-        assert self.idea.get_id() == 1
+        assert self.idea.get_id() == 'idea-1'
         assert self.idea.get_name() == 'use Python language'
-        assert self.idea.get_created_by() == 'rklinger'
-        assert self.idea.get_created_at() == '2014-02-03 13:33'
+        assert self.idea.get_meta_data().get_created_by() == 'rklinger'
+        assert self.idea.get_meta_data().get_created_at() == '2014-02-03 13:33'
 
 
     def test_assert_none_stakeholder(self):
@@ -36,7 +38,7 @@ class TestIdea(unittest.TestCase):
 
         
     def test_assert_stakeholder(self):
-        tester = Stakeholder(2, 'Tester')
+        tester = Stakeholder(ItemType('stakeholder', ''), 'stakeholder-2', 'Tester')
         self.idea.set_invented_by(tester)
         assert self.idea.get_invented_by() == tester
         
@@ -44,7 +46,8 @@ class TestIdea(unittest.TestCase):
     def test_to_string(self):
 #         print 'self.idea.get_description(): ' + str(self.idea.get_description())
 #         print 'self.idea.get_invented_by(): ' + str(self.idea.get_invented_by())
-        assert self.idea.__str__() == 'Idea {[id=1, name=use Python language][createdBy=rklinger, createdAt=2014-02-03 13:33]}' 
+#         print 'self.idea.__str__(): ' + self.idea.__str__()
+        assert 'id=idea-1' in self.idea.__str__()
 
 
     def test_to_config(self):

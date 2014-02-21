@@ -14,7 +14,7 @@ from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import SharedDataMiddleware
-from src.utils.Utils import new_line_to_br, get_max_id, create_base_item
+from src.utils.Utils import new_line_to_br, get_max_id, create_base_item, get_setter_method
 
 log = logging.getLogger(__name__)
 # console logger
@@ -29,12 +29,12 @@ class Gui(object):
     '''
     Class for web gui following REST style:
     HTTP 
-    Method URI                               Action
-    GET    http://[hostname]/item/           Retrieve list of items
-    GET    http://[hostname]/item/[item_id]  Retrieve a single item
-    POST   http://[hostname]/item/           Create a new item
-    PUT    http://[hostname]/item/[item_id]  Update an existing item
-    DELETE http://[hostname]/item/[item_id]  Delete a item
+    Method URI                                         Action
+    GET    http://[hostname]/item_type_name/           Retrieve list of items
+    GET    http://[hostname]/item_type_name/[item_id]  Retrieve a single item
+    POST   http://[hostname]/item_type_name/           Create a new item
+    PUT    http://[hostname]/item_type_name/[item_id]  Update an existing item
+    DELETE http://[hostname]/item_type_name/[item_id]  Delete a item
     
     jEditable for inline editing doesn't support PUT requests directly. It sends
     a POST request with additional attribute "_method=PUT".
@@ -61,8 +61,8 @@ class Gui(object):
         # define routing table
         self.url_map = Map([
             Rule('/', endpoint='new_url'),
-            Rule('/<item_type>/', endpoint='item_list'),
-            Rule('/<item_type>/<item_id>/', endpoint='single_item'),
+            Rule('/<item_type_name>/', endpoint='item_list'),
+            Rule('/<item_type_name>/<item_id>/', endpoint='single_item'),
             # special URL for entering or changing current username
             Rule('/user/', endpoint='user'),
             # special URL for searching over all items
@@ -103,44 +103,47 @@ class Gui(object):
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
-    def on_item_list(self, request, item_type):
+    def on_item_list(self, request, item_type_name):
         '''
         On request type GET retrieves all items of specified type.
         On request type POST creates a new item of specified type.
         '''
-        log.debug('on_item_list(' + str(request) + ', ' + item_type + ')')
-        self.check_valid_item_type(item_type)
+        log.debug('on_item_list(' + str(request) + ', ' + item_type_name + ')')
+        self.check_valid_item_type(item_type_name)
         if request.method == 'GET':
             log.debug('request.method: GET')
-            template = self.get_sodocu().get_config().get_item_type(item_type).get_table_template()
+            item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+            template = item_type.get_table_template()
             items = self.sodocu.get_items_by_type(item_type)
-            return self.render_all_item_as_table(template, item_type, items)
+            return self.render_all_item_as_table(template, item_type_name, items)
         elif request.method == 'POST':
             log.debug('request.method: POST')
-            return self.render_new_item_as_form(item_type)
+            return self.render_new_item_as_form(item_type_name)
 
 
-    def on_single_item(self, request, item_type, item_id):
+    def on_single_item(self, request, item_type_name, item_id):
         '''
         On request type GET retrieves details of specified item.
         On request type PUT updates data of specified item.
         On request type DELETE deletes the of specified item.
         '''
-        log.debug('on_single_item(' + str(request) + ', ' + item_type + ', ' + item_id + ')')
-        self.check_valid_item_type(item_type)
+        log.debug('on_single_item(' + str(request) + ', ' + item_type_name + ', ' + item_id + ')')
+        self.check_valid_item_type(item_type_name)
+        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+        
         if request.method == 'GET':
             log.debug('request.method: GET')
             item = self.sodocu.get_item_by_id(item_type, item_id)
-            return self.render_one_item_as_form(item_type, item)
+            return self.render_one_item_as_form(item)
         elif self.is_put_request(request):
             log.debug('request.method: PUT')
             if self.is_single_attribute_update(request):
-                return self.update_single_attribute(request, item_type, item_id)
+                return self.update_single_attribute(request, item_type_name, item_id)
             else:
-                return self.create_or_update_item(request, item_type, item_id)
+                return self.create_or_update_item(request, item_type_name, item_id)
         elif request.method == 'DELETE':
             log.debug('request.method: DELETE')
-            self.get_sodocu().delete_item(item_type, item_id)
+            self.get_sodocu().delete_item(item_type_name, item_id)
             # JavaScript delete method requires text response "success" for removing table row
             return Response('success', mimetype='text/plain')
         else:
@@ -194,43 +197,46 @@ class Gui(object):
         return True
     
     
-    def check_valid_item_type(self, item_type):
-        if not self.is_valid_item_type(item_type):
-            log.warn('Unknown item type: ' + item_type)
+    def check_valid_item_type(self, item_type_name):
+        if not self.is_valid_item_type(item_type_name):
+            log.warn('Unknown item type: ' + item_type_name)
             raise NotFound()
         return True
 
 
-    def render_all_item_as_table(self, template, item_type, items):
+    def render_all_item_as_table(self, template, item_type_name, items):
         return self.render_template(template, 
-                                    item_type=item_type,
+                                    item_type=item_type_name,
                                     items=items, 
                                     user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
-    def render_new_item_as_form(self, item_type):
-        new_id = item_type + '-' + str(get_max_id(self.sodocu.get_items_by_type(item_type)) + 1)
+    def render_new_item_as_form(self, item_type_name):
+        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+        new_id = item_type_name + '-' + str(get_max_id(self.sodocu.get_items_by_type(item_type)) + 1)
         temp_item = create_base_item(item_type, new_id, '')
-        return self.render_one_item_as_form(item_type, temp_item)
+        return self.render_one_item_as_form(temp_item)
 
 
-    def render_one_item_as_form(self, item_type, item):
-        log.debug('render_one_item_as_form(' + item_type + ', ' + str(item) + ')')
-        return self.render_template(self.get_sodocu().get_config().get_item_type(item_type).get_form_template(), 
+    def render_one_item_as_form(self, item):
+        log.debug('render_one_item_as_form(' + str(item) + ')')
+        item_type = item.get_item_type()
+        return self.render_template(item_type.get_form_template(), 
                                     item=item,
-                                    item_type=item_type,
+                                    item_type=item_type.get_name(),
                                     user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
 
 
-    def update_single_attribute(self, request, item_type, item_id):
-        log.debug('update_single_attribute(' + str(request) + ', ' + item_type + ', ' + item_id + ')')
+    def update_single_attribute(self, request, item_type_name, item_id):
+        log.debug('update_single_attribute(' + str(request) + ', ' + item_type_name + ', ' + item_id + ')')
         
         if item_id != request.form['id']:
             raise MethodNotAllowed(description='URL and form data do not match!')
         
-        item = self.get_sodocu().get_item_by_id(item_type, item_id)
+        item = self.get_item_by_name(item_type_name, item_id)
+        
         if item is None:
             raise NotFound()
             
@@ -241,8 +247,8 @@ class Gui(object):
         log.debug("value: " + value)
         
         self.get_sodocu().set_attribut(item, attribute, value)
-        item.set_changed_by(self.get_user())
-        item.set_changed_now()
+        item.get_meta_data().set_changed_by(self.get_user())
+        item.get_meta_data().set_changed_now()
         self.get_sodocu().save_item(item)
         
         # jEditable requires submited data as return value for updating table
@@ -250,25 +256,26 @@ class Gui(object):
         return Response(request.form['value'])
     
     
-    def create_or_update_item(self, request, item_type, item_id):
-        log.debug('create_or_update_item(' + str(request) + ', ' + item_type + ', ' + item_id+ ')')
+    def create_or_update_item(self, request, item_type_name, item_id):
+        log.debug('create_or_update_item(' + str(request) + ', ' + item_type_name + ', ' + item_id+ ')')
+        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
         item = self.sodocu.get_item_by_id(item_type, item_id)
         log.debug('item: ' + str(item))
         if item is not None:
             self.update_item(request, item)
-            item.set_changed_by(self.get_user())
-            item.set_changed_now()
+            item.get_meta_data().set_changed_by(self.get_user())
+            item.get_meta_data().set_changed_now()
             self.get_sodocu().save_item(item)
         else:
             new_item = create_base_item(item_type, item_id, request.form['name'])
-            new_item.set_created_by(self.get_user())
-            new_item.set_created_now()
+            new_item.get_meta_data().set_created_by(self.get_user())
+            new_item.get_meta_data().set_created_now()
             self.update_item(request, new_item)
             if new_item is not None:
                 self.get_sodocu().add_item(new_item)
                 self.get_sodocu().save_item(new_item)
 
-        return redirect('/%s/' % item_type)
+        return redirect('/%s/' % item_type_name)
 
 
     def update_item(self, request, item):
@@ -278,16 +285,21 @@ class Gui(object):
         log.debug('update_item(' + str(request) + ', ' + str(item) + ')')
         for key in request.form:
             try:
-                setter_method = getattr(item, 'set_' + key)
+                setter_method = get_setter_method(item, key)
                 log.debug('setter_method: ' + str(setter_method))
                 setter_method(''.join(request.form.getlist(key)))
             except AttributeError:
                 log.info('Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
 
 
-    def is_valid_item_type(self, item_type):
+    def get_item_by_name(self, item_type_name, item_id):
+        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+        return self.get_sodocu().get_item_by_id(item_type, item_id)
+
+    
+    def is_valid_item_type(self, item_type_name):
         log.debug('valid item types: ' + str(self.get_sodocu().get_config().get_item_types_as_string()))
-        return item_type in self.get_sodocu().get_config().get_item_types_as_string()
+        return item_type_name in self.get_sodocu().get_config().get_item_types_as_string()
     
     
     def is_put_request(self, request):

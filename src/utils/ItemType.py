@@ -15,6 +15,7 @@ class ItemType(object):
         self.__menu_position = None
         self.__form_template = None
         self.__table_template = None
+        self.__valid_relations = dict()
 
 
     def get_name(self):
@@ -49,11 +50,20 @@ class ItemType(object):
         self.__table_template = value
 
 
+    def get_valid_relations(self):
+        return self.__valid_relations
+
+
+    def add_valid_relation(self,key, value):
+        self.__valid_relations[key] = value
+
+
     name = property(get_name, None, None, None)
     path = property(get_path, None, None, None)
     menu_position = property(get_menu_position, set_menu_position, None, None)
     form_template = property(get_form_template, set_form_template, None, None)
     table_template = property(get_table_template, set_table_template, None, None)
+    valid_relations = property(get_valid_relations, None, None, None)
 
 
     def __str__(self):

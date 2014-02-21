@@ -1,0 +1,11 @@
+[stakeholder]
+id = stakeholder-1
+name = tester
+description = der testet allet
+
+[meta]
+created_by = rklinger
+created_at = 20.02.2014 15:26
+changed_by = rklinger
+changed_at = 20.02.2014 15:48
+

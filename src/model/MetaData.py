@@ -12,6 +12,7 @@ class MetaData(object):
     Abstract class with common meta for all items.
     '''
     TIME_FORMAT = "%d.%m.%Y %H:%M"
+    SECTION_NAME = 'meta'
 
     def __init__(self):
         self.__createdBy = None
@@ -64,19 +65,9 @@ class MetaData(object):
     def __config__(self):
         config = ConfigParser.ConfigParser()
         
-        config.add_section('meta')
-        config.set('meta', 'created_by', str(self.get_created_by()) if hasattr(self, 'createdBy') else '')
-        config.set('meta', 'created_at', str(self.get_created_at()) if hasattr(self, 'createdAt') else '')
-        config.set('meta', 'changed_by', str(self.get_changed_by()) if hasattr(self, 'changedBy') else '')
-        config.set('meta', 'changed_at', str(self.get_changed_at()) if hasattr(self, 'changedAt') else '')
+        config.add_section(self.SECTION_NAME)
+        config.set(self.SECTION_NAME, 'created_by', str(self.get_created_by()) if hasattr(self, 'createdBy') else '')
+        config.set(self.SECTION_NAME, 'created_at', str(self.get_created_at()) if hasattr(self, 'createdAt') else '')
+        config.set(self.SECTION_NAME, 'changed_by', str(self.get_changed_by()) if hasattr(self, 'changedBy') else '')
+        config.set(self.SECTION_NAME, 'changed_at', str(self.get_changed_at()) if hasattr(self, 'changedAt') else '')
         return config       
-
-
-def merge_meta_config(meta_config, abstract_config):
-    '''
-    Copies options from MetaData into given config.
-    '''
-    abstract_config.add_section('meta')
-    for option in meta_config.options('meta'):
-        abstract_config.set('meta', option, meta_config.get('meta', option))
-    return abstract_config

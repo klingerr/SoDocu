@@ -36,8 +36,8 @@ class TestGlossary(unittest.TestCase):
 #         print 'json_data: ' + str(json_data) 
 #         print 'python_data: ' + str(python_data) 
 #         print 'python_data[0][u\'term\']: ' + str(python_data[0][u'term'])
-        assert 'stakeholder' == str(python_data[0][u'term'])
-        assert 'person' in str(python_data[0][u'description'])
+        assert 'acceptence' in str(python_data[0][u'term'])
+        assert 'verifies' in str(python_data[0][u'description'])
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

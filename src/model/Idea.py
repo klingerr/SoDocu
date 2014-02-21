@@ -5,25 +5,25 @@ Created on 03.02.2014
 '''
 import logging
 
-from AbstractItem import AbstractItem
-from MetaData import MetaData, merge_meta_config
-from Stakeholder import Stakeholder
+from src.model.AbstractItem import AbstractItem
+from src.model.Stakeholder import Stakeholder
+from src.utils.Utils import merge_item_configs
 
 
 log = logging.getLogger(__name__)
 
 
-class Idea(AbstractItem, MetaData):
+class Idea(AbstractItem):
     '''
     An idea isn't a direct requirement artifact. It has to be investigated for 
     business targets.
     '''
 
-    def __init__(self, identity, name):
+    def __init__(self, item_type, identity, name):
         '''
         Creates a new idea with given id and name.
         '''
-        super(Idea, self).__init__(identity, name)
+        super(Idea, self).__init__(item_type, identity, name)
         self.__inventedBy = None
 
 
@@ -38,16 +38,21 @@ class Idea(AbstractItem, MetaData):
             log.warn('InventedBy must be a stakeholder!')
             raise Exception('InventedBy must be a stakeholder!')
         
+
     inventedBy = property(get_invented_by, set_invented_by, None, None)
 
     
     def __config__(self):
-        meta_config = MetaData.__config__(self)
         abstract_config = AbstractItem.__config__(self)
-        config = merge_meta_config(meta_config, abstract_config)
-        abstract_config.set('idea', 'inventedBy', self.get_invented_by() if hasattr(self, 'inventedBy') else '')
+        meta_config = self.get_meta_data().__config__()
+        relations_config = self.get_relations().__config__()
+        config = merge_item_configs(abstract_config, meta_config)
+        config = merge_item_configs(config, relations_config)
+        config.set('idea', 'inventedBy', self.get_invented_by() if hasattr(self, 'inventedBy') else '')
         return config        
 
 
     def __str__(self):
-        return 'Idea {' + AbstractItem.__str__(self) + MetaData.__str__(self) + '}' 
+        return 'Idea {' + AbstractItem.__str__(self) \
+                        + self.get_meta_data().__str__() \
+                        + self.get_relations().__str__() + '}' 

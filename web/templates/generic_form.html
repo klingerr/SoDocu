@@ -1,7 +1,13 @@
 {% extends "layout.html" %}
 {% block title %}New {{ item_type }}{% endblock %}
 {% block body %}
-  <h2>Create new {{ item_type }}</h2>
+  <h2>
+    {% if item.name == '' %}
+      Create new 
+    {% else %}
+      Edit
+    {% endif %}
+    {{ item_type }}</h2>
   <form action="/{{ item_type }}/{{ item.id }}/" method="post">
 
 	<!-- for creating a PUT request -->
@@ -26,9 +32,26 @@
 		      <td>description</td>
 		      <td><textarea name="description" cols="60" rows="7">{{ item.description }}</textarea></td>
 		    </tr>
+		    
+		    
+		    
 		    <tr>
 		      <td colspan="2"><b>Relations</b></td>
 		    </tr>
+		    
+		    {%- for key in item.item_type.valid_relations.keys() %}
+		    <tr>
+		      <td>
+	    		{{ key }}
+   		      </td>
+		      <td>
+			    {%- for related_item in item.relations.get_related_items_by_relation_name(key) %}
+			    	{{ related_item.id }}
+	    		{%- endfor %}
+   		      </td>
+		    </tr>
+    		{%- endfor %}
+		    
 		    <tr>
 		      <td>invented by (stakeholder)</td>
 		      <td>

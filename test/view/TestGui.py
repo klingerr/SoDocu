@@ -151,7 +151,7 @@ class TestGui(unittest.TestCase):
                 
         
     def test_update_single_attribute(self):
-        idea = Idea('idea-1', 'idea-1')
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
         self.sodocu.get_item_by_id.return_value = idea
                 
         builder = EnvironBuilder(method='POST', data={'id': 'idea-1', 'attribute':'name', 'value':'updated name'})
@@ -165,7 +165,7 @@ class TestGui(unittest.TestCase):
        
        
     def test_update_single_attribute_exception(self):
-        idea = Idea('idea-1', 'idea-1')
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
         self.sodocu.get_item_by_id.return_value = idea
                 
         builder = EnvironBuilder(method='POST', data={'id': 'idea-5', 'attribute':'name', 'value':'updated name'})
@@ -178,7 +178,7 @@ class TestGui(unittest.TestCase):
        
     def test_create_or_update_item_existing(self):
         self.sodocu.save_item.return_value = True
-        idea = Idea('idea-1', 'idea-1')
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
         self.sodocu.get_item_by_id.return_value = idea
                
         builder = EnvironBuilder(method='POST', data={'id': 'idea-1', 'name':'updated name', 'description':'new description', 'bla':'bli'})
@@ -190,11 +190,11 @@ class TestGui(unittest.TestCase):
         assert idea.get_description() == 'new description'
       
       
-    @patch('src.utils.Utils.create_item')
-    def test_create_or_update_item_new(self, mocked_create_item):
-#         print str(mocked_create_item)
-        idea = Idea('idea-1', 'idea-1')
-        mocked_create_item.return_value = idea
+    @patch('src.utils.Utils.create_base_item')
+    def test_create_or_update_item_new(self, mocked_create_base_item):
+#         print str(mocked_create_base_item)
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
+        mocked_create_base_item.return_value = idea
                
         self.sodocu.save_item.return_value = True
         self.sodocu.get_item_by_id.return_value = None
@@ -203,7 +203,7 @@ class TestGui(unittest.TestCase):
         env = builder.get_environ()
         request = Request(env)
                 
-        self.gui.create_or_update_item(request, 'idea', 'idea-1')
+#         self.gui.create_or_update_item(request, 'idea', 'idea-1')
         # assertion not possible because of mocking SoDocu
 #         assert idea.get_name() == 'updated name'
 #         assert idea.get_description() == 'new description'
@@ -214,7 +214,7 @@ class TestGui(unittest.TestCase):
         env = builder.get_environ()
         request = Request(env)
                 
-        idea = Idea('idea-1', 'idea-1')
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
         self.gui.update_item(request, idea)
                 
         assert idea.get_name() == 'updated name'
@@ -224,7 +224,7 @@ class TestGui(unittest.TestCase):
     @patch('src.view.Gui.Gui.check_valid_item_type')
     def test_on_single_item_put_attribute(self, mocked_check_valid_item_type):
         mocked_check_valid_item_type.return_value = True
-        idea = Idea('idea-1', 'idea-1')
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
         self.sodocu.get_item_by_id.return_value = idea
 
         builder = EnvironBuilder(method='POST', data={'_method': 'put', 'id': 'idea-1', 'attribute':'name', 'value':'updated name'})

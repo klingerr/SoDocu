@@ -14,10 +14,13 @@ log = logging.getLogger(__name__)
 # log.addHandler(logging.StreamHandler())
 # log.setLevel(logging.DEBUG)
 
+
 class Config(object):
     '''
     Reads and holds the current configuration of SoDocu.
     '''
+    FIX_OPTIONS = ['path', 'menu_position', 'form_template', 'table_template']
+
 
     def __init__(self):
         '''
@@ -39,7 +42,7 @@ class Config(object):
 
     def get_item_types(self):
         # @see: https://wiki.python.org/moin/HowTo/Sorting
-        return sorted(list(self.__item_types), key=lambda item_type: item_type.menu_position)
+        return sorted(list(self.__item_types), key=lambda item_type: int(item_type.menu_position))
 
 
     def add_item_type(self, item_type):
@@ -78,19 +81,26 @@ class Config(object):
     
  
     def read_config(self):
-        self.clear_item_types()
-#         print project_path
         conf_file = os.path.join(self.get_project_path(), 'sodocu.conf')
-#         print conf_file
+        log.debug('conf_file: ' + conf_file)
         config = read_file(conf_file)
         self.set_sodocu_path(os.path.join(self.get_project_path(), config.get('main', 'path')))
-        
+
+        # fill all item options        
+        self.clear_item_types()
         for section in config.sections():
             if section != 'main':
+                # fix optionen    
                 item_type = ItemType(section, config.get(section, 'path'))
                 item_type.set_menu_position(config.get(section, 'menu_position'))
                 item_type.set_form_template(config.get(section, 'form_template'))
                 item_type.set_table_template(config.get(section, 'table_template'))
+                
+                # variable relations options
+                for option in config.options(section):
+                    if option not in Config.FIX_OPTIONS and (option.endswith('_by') or option.endswith('_from')):
+                        item_type.add_valid_relation(option, config.get(section, option))
+                        
                 self.add_item_type(item_type)
                 
                 

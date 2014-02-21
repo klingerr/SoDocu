@@ -21,7 +21,7 @@ class Test(unittest.TestCase):
 
 
     def test_get_sodocu_path(self):
-        print self.config.get_sodocu_path()
+#         print self.config.get_sodocu_path()
         assert 'SoDocu' + os.sep + './sodocu' in self.config.get_sodocu_path()
         
 
@@ -53,10 +53,11 @@ class Test(unittest.TestCase):
         
  
     def test_get_item_types(self):
-#        print self.config.get_item_types()
+        print self.config.get_item_types()
         assert 'idea' == self.config.get_item_types()[0].get_name()
         assert 'stakeholder' == self.config.get_item_types()[1].get_name()
         assert 'document' == self.config.get_item_types()[2].get_name()
+        assert 'invented_by' in str(self.config.get_item_types()[0].get_valid_relations())
         
  
 if __name__ == "__main__":

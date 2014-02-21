@@ -31,18 +31,24 @@
       <th>ID</th>
       <th id="name">name</th>
       <th id="description">description</th>
+      <th>links</th>
       <th>created <br/> by / at</th>
       <th>changed <br/> by / at</th>
       <th></th>
     </thead>
     {%- for item in items %}
     <tr id="{{ item.id }}">
-      <td><a href="/{{ item.item_type }}/{{ item.id }}/" title='edit "{{ item.id }}"'>{{ item.id }}</a></td>
+      <td><a href="/{{ item.item_type.name }}/{{ item.id }}/" title='edit "{{ item.id }}"'>{{ item.id }}</a></td>
       <td class="growable">{{ item.name }}</td>
 <!--  <td class="growable">{{ item.description|new_line_to_br|safe }}</td> -->
-      <td class="growable">{{ item.description|safe }}</td>
-      <td>{{ item.createdBy }} / {{ item.createdAt }}</td>
-      <td>{{ item.changedBy }} / {{ item.changedAt }}</td>
+      <td class="growable">{{ item.description }}</td>
+      <td>
+	    {%- for related_item in item.relations.existing_relations %}
+	    	{{ related_item }}
+    	{%- endfor %}
+      </td>
+      <td>{{ item.meta_data.createdBy }} / {{ item.meta_data.createdAt }}</td>
+      <td>{{ item.meta_data.changedBy }} / {{ item.meta_data.changedAt }}</td>
       <td>
 		  <a href="javascript:;" class="delete btn btn-default btn-sm" role="button" title='delete "{{ item.id }}"'>      
   			<span class="glyphicon glyphicon-remove"></span>

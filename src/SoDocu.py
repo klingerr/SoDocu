@@ -10,14 +10,14 @@ from src.persistence.DirectoryWalker import DirectoryWalker
 from src.persistence.FileHandler import FileHandler, read_file
 from src.utils.Config import Config
 from src.utils.Glossary import Glossary
-from src.utils.Utils import create_item
+from src.utils.Utils import create_item, get_setter_method
 from src.view.Gui import create_gui
 
 
 log = logging.getLogger('SoDocu')
 # console logger
-# log.addHandler(logging.StreamHandler())
-# log.setLevel(logging.DEBUG)
+log.addHandler(logging.StreamHandler())
+log.setLevel(logging.DEBUG)
 
 
 class SoDocu(object):
@@ -33,9 +33,9 @@ class SoDocu(object):
         self.__config = sodocu_config
         self.__path = self.__config.get_sodocu_path()
         self.__fileHandler = FileHandler(self.__config)
-        # dictionary/map with item_type as key and set of items as value
+        # dictionary/map with item_type_name as key and set of items as value
         self.__items = self.initialize_items_dictionary()
-        self.read_all_items()
+        self.read_all_items(self.__config)
 
 
     def initialize_items_dictionary(self):
@@ -43,8 +43,8 @@ class SoDocu(object):
         Creates a dictionary with one key for each item type and an empty set as value.
         '''
         items = dict()
-        for item_type in self.get_config().get_item_types_as_string():
-            items[item_type] = set()
+        for item_type_name in self.get_config().get_item_types_as_string():
+            items[item_type_name] = set()
         return items 
 
 
@@ -70,7 +70,7 @@ class SoDocu(object):
 
     def get_items_by_type(self, item_type):
         try:
-            return self.__items[item_type]
+            return self.__items[item_type.get_name()]
         except KeyError:
             log.info('There are no items of type <' + item_type + '>')
         return None
@@ -78,11 +78,11 @@ class SoDocu(object):
 
     def add_item(self, item):
         log.debug('add_item(' + str(item) + ')')
-        item_type = item.__class__.__name__.lower()
+        item_type = item.get_item_type()
         items = self.get_items_by_type(item_type)
-        if items is None:
-            self.__items[item_type] = set()
-            items = self.get_items_by_type(item_type)
+#         if items is None:
+#             self.__items[item_type.get_name()] = set()
+#             items = self.get_items_by_type(item_type)
         items.add(item)
 
         
@@ -93,24 +93,24 @@ class SoDocu(object):
     config = property(get_config, None, None, None)
 
         
-    def read_all_items(self):
+    def read_all_items(self, sodocu_config):
         directoryWalker = DirectoryWalker(self.get_path())
         log.debug('directoryWalker.get_filenames(): ' + str(directoryWalker.get_filenames()))
         for filename in directoryWalker.get_filenames():
             item_config = read_file(filename)
-            item = create_item(item_config, filename)
+            item = create_item(sodocu_config, item_config, filename)
             self.add_item(item)
 
 
     def set_attribut(self, item, attribute, value):
         log.debug('set_attribut: ' + str(item) + ', ' + attribute + ', ' + value + ')')
-        setter_method = getattr(item, 'set_' + attribute)
+        setter_method = get_setter_method(item, attribute)
         log.debug('setter_method: ' + str(setter_method))
         setter_method(value)
 
 
     def get_item_by_id(self, item_type, identifier):
-        log.debug('get_item_by_id(' + str(item_type) + ', ' + item_type + ', ' + str(identifier) + ')') 
+        log.debug('get_item_by_id(' + str(item_type) + ', ' + str(identifier) + ')') 
         items = self.get_items_by_type(item_type)
         if items is None:
             log.debug('item: ' + str(None)) 
@@ -126,8 +126,7 @@ class SoDocu(object):
         return self.get_file_handler().update_file(item)
         
         
-    def delete_item(self, item_type, item_id):
-        item = self.get_item_by_id(item_type, item_id)
+    def delete_item(self, item):
         if self.get_file_handler().delete_file(item):
             return self.remove_item(item)
         return False
@@ -137,8 +136,7 @@ class SoDocu(object):
         '''
         Removes the given item from set of item_types
         '''
-        item_type = item.__class__.__name__.lower()
-        items = self.get_items_by_type(item_type)
+        items = self.get_items_by_type(item.get_item_type())
         if items is None:
             return False
         
@@ -153,7 +151,8 @@ class SoDocu(object):
     def search(self, search_string):
         results = set()
         for key in self.get_items().keys():
-            for value in self.get_items_by_type(key):
+            item_type = self.get_config().get_item_type(key)
+            for value in self.get_items_by_type(item_type):
                 if value.contains_text(search_string):
                     results.add(value)
         return results

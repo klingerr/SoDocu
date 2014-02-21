@@ -4,6 +4,9 @@ Created on 31.01.2014
 @author: RKlinger
 '''
 import ConfigParser
+
+from src.model.MetaData import MetaData
+from src.model.Relations import Relations
 from src.utils.Utils import make_camel_case
 
 
@@ -12,7 +15,7 @@ class AbstractItem(object):
     Abstract class with common properties for all items.
     '''
 
-    def __init__(self, identity, name):
+    def __init__(self, item_type, identity, name):
         '''
         Creates a new Item with an ID an a name.
         '''
@@ -20,7 +23,15 @@ class AbstractItem(object):
         self.__name = name
         self.__description = ''
         self.__filename = None
-        self.__item_type = self.__class__.__name__.lower()
+        self.__item_type = item_type
+        self.__meta_data = MetaData()
+        self.__relations = Relations()
+
+    def get_meta_data(self):
+        return self.__meta_data
+
+    def get_relations(self):
+        return self.__relations
 
     def get_id(self):
         return self.__id
@@ -60,6 +71,8 @@ class AbstractItem(object):
     description = property(get_description, set_description, None, None)
     filename = property(get_filename, set_filename, None, None)
     item_type = property(get_item_type, None, None, None)
+    meta_data = property(get_meta_data, None, None, None)
+    relations = property(get_relations, None, None, None)
 
 
     def contains_text(self, text):

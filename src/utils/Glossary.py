@@ -34,7 +34,7 @@ class Glossary(object):
 
     def get_entries_as_json(self):
         entry_list = []
-        for key in self.get_entries().keys():
+        for key in sorted(self.get_entries().keys()):
             entry_list.append({'term':key, 'description':self.get_entries()[key]})
         log.debug('entry_list: ' + str(entry_list))
         return json.dumps(entry_list, indent=2)

@@ -5,7 +5,8 @@ Created on 03.02.2014
 '''
 import unittest
 import ConfigParser
-from src.model.MetaData import MetaData, merge_meta_config
+from src.model.MetaData import MetaData
+from src.utils.Utils import merge_item_configs
 
 class TestMetaData(unittest.TestCase):
 
@@ -44,7 +45,7 @@ class TestMetaData(unittest.TestCase):
         test_config = ConfigParser.ConfigParser()
         test_config.add_section('test')
         test_config.set('test', 'option', 'value')
-        merged_config = merge_meta_config(meta_config, test_config)
+        merged_config = merge_item_configs(meta_config, test_config)
         assert merged_config.has_section('meta')
         assert merged_config.has_option('meta', 'created_by')
         assert merged_config.get('meta', 'created_by') == 'rklinger'

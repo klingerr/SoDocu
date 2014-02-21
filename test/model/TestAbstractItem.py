@@ -4,14 +4,15 @@ Created on 31.01.2014
 @author: RKlinger
 '''
 import unittest
+
 from src.model.AbstractItem import AbstractItem
-from setuptools.dist import assert_bool
+
 
 class TestAbstractItem(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.abstractItem = AbstractItem(0, 'bla')
+        self.abstractItem = AbstractItem(None, 0, 'bla')
  
  
     @classmethod 
@@ -42,12 +43,12 @@ class TestAbstractItem(unittest.TestCase):
 
 
     def test_equals(self):
-        abstractItem2 = AbstractItem(0, 'bla')
+        abstractItem2 = AbstractItem(None, 0, 'bla')
         assert abstractItem2 == self.abstractItem
         
 
     def test_not_equals(self):
-        abstractItem2 = AbstractItem(1, 'bla')
+        abstractItem2 = AbstractItem(None, 1, 'bla')
         assert abstractItem2 != self.abstractItem
         
 
