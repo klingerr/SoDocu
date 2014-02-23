@@ -16,8 +16,8 @@ from src.view.Gui import create_gui
 
 log = logging.getLogger('SoDocu')
 # console logger
-log.addHandler(logging.StreamHandler())
-log.setLevel(logging.DEBUG)
+# log.addHandler(logging.StreamHandler())
+# log.setLevel(logging.DEBUG)
 
 
 class SoDocu(object):

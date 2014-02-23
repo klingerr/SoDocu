@@ -289,21 +289,14 @@ class Relations(object):
     def __config__(self):
         config = ConfigParser()
          
-        config.add_section(self.SECTION_NAME)
-        config.set(self.SECTION_NAME,'accomplished_by', str(self.get_accomplished_by) if hasattr(self,'accomplished_by') else'')
-        config.set(self.SECTION_NAME,'accomplished_from', str(self.get_accomplished_from) if hasattr(self,'accomplished_from') else'')
-        config.set(self.SECTION_NAME,'extracted_by', str(self.get_extracted_by) if hasattr(self,'extracted_by') else'')
-        config.set(self.SECTION_NAME,'extracted_from', str(self.get_extracted_from) if hasattr(self,'extracted_from') else'')
-        config.set(self.SECTION_NAME,'grouped_by', str(self.get_grouped_by) if hasattr(self,'grouped_by') else'')
-        config.set(self.SECTION_NAME,'grouped_from', str(self.get_grouped_from) if hasattr(self,'grouped_from') else'')
-        config.set(self.SECTION_NAME,'invented_by', str(self.get_invented_by) if hasattr(self,'invented_by') else'')
-        config.set(self.SECTION_NAME,'invented_from', str(self.get_invented_from) if hasattr(self,'invented_from') else'')
-        config.set(self.SECTION_NAME,'refined_by', str(self.get_refined_by) if hasattr(self,'refined_by') else'')
-        config.set(self.SECTION_NAME,'refined_from', str(self.get_refined_from) if hasattr(self,'refined_from') else'')
-        config.set(self.SECTION_NAME,'solved_by', str(self.get_solved_by) if hasattr(self,'solved_by') else'')
-        config.set(self.SECTION_NAME,'solved_from', str(self.get_solved_from) if hasattr(self,'solved_from') else'')
-        config.set(self.SECTION_NAME,'specified_by', str(self.get_specified_by) if hasattr(self,'specified_by') else'')
-        config.set(self.SECTION_NAME,'specified_from', str(self.get_specified_from) if hasattr(self,'specified_from') else'')
-        config.set(self.SECTION_NAME,'verified_by', str(self.get_verified_by) if hasattr(self,'verified_by') else'')
-        config.set(self.SECTION_NAME,'verified_from', str(self.get_verified_from) if hasattr(self,'verified_from') else'')
+        config.add_section(Relations.SECTION_NAME)
+        for key in self.__dict__.keys():
+            option = str(key.replace('_Relations__', ''))
+            log.debug('option: ' + option)
+            getter_method = getattr(self, 'get_' + key.replace('_Relations__', ''))
+            log.debug('getter_method: ' + str(getter_method()))
+            log.debug('len(list(getter_method())): ' + str(len(list(getter_method()))))
+            if len(list(getter_method())) > 0:
+                log.debug('config.set(' + Relations.SECTION_NAME + ', ' + option + ', ' + str(list(getter_method())) + ')')
+                config.set(Relations.SECTION_NAME, option, ', '.join(sorted(getter_method())))
         return config       

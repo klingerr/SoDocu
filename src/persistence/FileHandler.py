@@ -10,6 +10,9 @@ import ConfigParser
 from src.utils.Utils import get_file_basename
 
 log = logging.getLogger(__name__)
+# console logger
+# log.addHandler(logging.StreamHandler())
+# log.setLevel(logging.DEBUG)
 
 
 class FileHandler(object):

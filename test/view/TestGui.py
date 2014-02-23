@@ -4,7 +4,6 @@ Created on 14.02.2014
 @author: RKlinger
 '''
 import unittest
-import json
 
 from mock import Mock, patch
 from werkzeug.test import EnvironBuilder
@@ -199,9 +198,9 @@ class TestGui(unittest.TestCase):
         self.sodocu.save_item.return_value = True
         self.sodocu.get_item_by_id.return_value = None
                
-        builder = EnvironBuilder(method='POST', data={'id': 'idea-1', 'name':'updated name', 'description':'new description', 'bla':'bli'})
-        env = builder.get_environ()
-        request = Request(env)
+#         builder = EnvironBuilder(method='POST', data={'id': 'idea-1', 'name':'updated name', 'description':'new description', 'bla':'bli'})
+#         env = builder.get_environ()
+#         request = Request(env)
                 
 #         self.gui.create_or_update_item(request, 'idea', 'idea-1')
         # assertion not possible because of mocking SoDocu
@@ -337,7 +336,7 @@ class TestGui(unittest.TestCase):
         env = builder.get_environ()
         request = Request(env)
         
-        print str(self.gui.on_json_glossary(request).data)
+#         print str(self.gui.on_json_glossary(request).data)
         assert 'stakeholder' in str(self.gui.on_json_glossary(request).data) 
   
 

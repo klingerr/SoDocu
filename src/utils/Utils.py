@@ -13,11 +13,10 @@ import os
 from src.model.MetaData import MetaData
 from src.model.Relations import Relations
 
-
 log = logging.getLogger(__name__)
 # console logger
-log.addHandler(logging.StreamHandler())
-log.setLevel(logging.DEBUG)
+# log.addHandler(logging.StreamHandler())
+# log.setLevel(logging.DEBUG)
 
 
 def make_camel_case(text):

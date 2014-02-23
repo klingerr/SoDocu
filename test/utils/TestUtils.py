@@ -67,7 +67,7 @@ class Test(unittest.TestCase):
         assert isinstance(item, Idea)
         assert item.get_id() == 'idea-1'
         assert item.get_meta_data().get_created_by() == 'rklinger'
-        print 'item.get_relations().get_invented_by(): ' + str(item.get_relations().get_invented_by())
+#         print 'item.get_relations().get_invented_by(): ' + str(item.get_relations().get_invented_by())
         assert 'stakeholder-1' in str(item.get_relations().get_invented_by())
             
 
