@@ -89,11 +89,16 @@ $(document).ready(function() {
 		},
 		"submitdata": function(value, settings) {
 			var itemType = window.location.href.split( '/' )[3]
+			var attribute = $('#items th').eq($(this).index()).attr('id')
+			// alert('itemType: ' + itemType + ', ' + 'attribute: ' + attribute)
 			/* update the request URL */
 			settings.target = "/" + itemType + "/" + this.parentNode.getAttribute("id") + "/";
+			if (itemType == 'glossary' && attribute == 'term') {
+				this.parentNode.setAttribute("id", value)
+			}
 			return {
 				"id": this.parentNode.getAttribute("id"),
-				"attribute": $('#items th').eq($(this).index()).attr('id')
+				"attribute": attribute
 			};
 		}
 	});
@@ -179,7 +184,8 @@ $(function(){
       
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="/user/">{{ user }}</a></li>
+            <li><a href="/glossary/" title="edit glossary">glossary</a></li>
+            <li><a href="/user/" title="change user">{{ user }}</a></li>
           </ul>
 
           <form name="search_form" action="/search/" method="post" class="navbar-form navbar-right">
@@ -218,14 +224,11 @@ $(function(){
           </ul>
         </div>
         
-        <!-- necessary for glossary tooltips -->
-        <div class="content">
           <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           
 {% block body %}{% endblock %}
 
 	     </div>
-       </div>
       </div>
     </div>
     

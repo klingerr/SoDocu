@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}New {{ item_type }}{% endblock %}
+{% block body %}
+
+<h2>Create new glosary term</h2>
+
+  <form action="/{{ item_type }}/new_term/" method="post">
+
+	<!-- for creating a PUT request -->
+  	<input type="hidden" name="_method" value="put" />
+
+  	
+    {% if error %}
+      <p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+    
+    <div class="table-responsive">  
+  		<table class="table table-striped table-hover">
+		    <tr>
+		      <td>term</td>
+		      <td><input type="text" name="term"></td>
+		    </tr>
+		    <tr>
+		      <td>description</td>
+		      <td><textarea name="description" cols="60" rows="7"></textarea></td>
+		    </tr>
+ 	    </table>
+	</div>
+    
+    <input type="submit" value="Save" class="btn btn-primary btn-sm" />
+    <a href="/glossary/">Cancel</a>
+  </form>
+{% endblock %}

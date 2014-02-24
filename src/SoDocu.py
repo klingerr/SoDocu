@@ -29,10 +29,10 @@ class SoDocu(object):
         '''
         Reads all items into memory.
         '''
-        self.__glossary = Glossary()
         self.__config = sodocu_config
-        self.__path = self.__config.get_sodocu_path()
         self.__fileHandler = FileHandler(self.__config)
+        self.__path = self.__config.get_sodocu_path()
+        self.__glossary = Glossary(self.__path)
         # dictionary/map with item_type_name as key and set of items as value
         self.__items = self.initialize_items_dictionary()
         self.read_all_items(self.__config)
@@ -158,9 +158,12 @@ class SoDocu(object):
         return results
 
 
-    def read_glossary_as_json(self):
-        self.get_glossary().read_glossary(self.get_config().get_sodocu_path())
+    def get_glossary_entries_as_json(self):
         return self.get_glossary().get_entries_as_json()
+        
+
+    def get_glossary_entries(self):
+        return self.get_glossary().get_entries()
         
 
 if __name__ == '__main__':

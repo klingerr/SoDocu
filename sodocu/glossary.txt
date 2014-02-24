@@ -1,11 +1,13 @@
 [glossary]
-stakeholder = a person, group or organization with an interest in a project. see http://en.wikipedia.org/wiki/Stakeholder_management
-idea = is just an thought of an improvement that must be invstigated
-document = any written information which is relevant for this system context 
-process = process which is executed within the context of this project
-system = technical system within the context of this project
-problem = issue what this software tries to solve
+requirement = single information what the software must implement
 target = feature which aims a business problem
-userStory = on sentence to describe expected behaviour
+process = process which is executed within the context of this project
+stakeholder = a person, group or organization with an interest in a project, see i.e.: 'stakeholder management' at wikipedia
+idea = is just an thought of an improvement that must be invstigated
+system = technical system within the context of this project
+user story = on sentence (with template) to describe expected behaviour
 acceptence criteria = verifies the correct implementation of the userStory
-requirement = single information what the software must implement 
+test = bla
+problem = issue what this software tries to solve
+document = any written information which is relevant for this system context
+

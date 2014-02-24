@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}{{ item_type }}s{% endblock %}
+{% block body %}
+
+<h1>{{ item_type }}</h1>
+  
+<!-- @see: http://getbootstrap.com/css/#tables -->
+<div class="table-responsive">  
+  <table class="table table-striped table-hover" id="items">
+    <thead>
+      <th id="term">term</th>
+      <th id="description">description</th>
+      <th></th>
+    </thead>
+    {%- for term in glossary.keys() %}
+    <tr id="{{ term }}">
+      <td class="growable">{{ term }}</td>
+      <td class="growable">{{ glossary[term]|safe }}</td>
+      <td>
+		  <a href="javascript:;" class="delete btn btn-default btn-sm" role="button" title='delete "{{ term }}"'>      
+  			<span class="glyphicon glyphicon-remove"></span>
+  		  </a>
+	  </td>
+    </tr>
+    {%- endfor %}
+  </table>
+</div>
+
+{% endblock %}

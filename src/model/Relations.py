@@ -287,6 +287,9 @@ class Relations(object):
  
  
     def __config__(self):
+        '''
+        Returns a config only with filled relations.
+        '''
         config = ConfigParser()
          
         config.add_section(Relations.SECTION_NAME)

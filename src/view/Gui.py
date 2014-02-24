@@ -68,7 +68,10 @@ class Gui(object):
             # special URL for searching over all items
             Rule('/search/', endpoint='search'),
             # special URL for getting glossary entries as json data
-            Rule('/glossary/json/', endpoint='json_glossary')
+            Rule('/glossary/json/', endpoint='json_glossary'),
+            # special URL for getting glossary entries for editing in frontend
+            Rule('/glossary/', endpoint='glossary'),
+            Rule('/glossary/<term>/', endpoint='glossary_term')
         ])
 
 
@@ -180,9 +183,67 @@ class Gui(object):
     def on_json_glossary(self, request):
         log.debug('on_json_glossary(' + str(request) + ')')
         if request.method == 'GET':
-            return Response(self.sodocu.read_glossary_as_json(), mimetype='application/json')
+            return Response(self.sodocu.get_glossary_entries_as_json(), mimetype='application/json')
     
     
+    def on_glossary(self, request):
+        '''
+        On request type GET retrieves all terms of glossary.
+        On request type POST creates a new term for glossary.
+        '''
+        log.debug('on_glossary(' + str(request) + ')')
+        if request.method == 'GET':
+            return self.render_template('glossary_table.html', 
+                                glossary=self.get_sodocu().get_glossary_entries(),
+                                item_type='glossary',
+                                user=self.get_user(),
+                                valid_item_types=self.get_sodocu().get_config().get_item_types())
+        elif request.method == 'POST':
+            log.debug('request.method: POST')
+            return self.render_template('glossary_form.html', 
+                                        item_type='glossary',
+                                        user=self.get_user(),
+                                        valid_item_types=self.get_sodocu().get_config().get_item_types())
+
+
+    def on_glossary_term(self, request, term):
+        '''
+        On request type PUT updates data of specified term.
+        On request type DELETE deletes the specified term.
+        '''
+        log.debug('on_glossary_term(' + str(request) + ', ' + term +')')
+        glossary = self.sodocu.get_glossary_entries()
+        if self.is_put_request(request):
+            log.debug('request.method: PUT')
+            if self.is_single_attribute_update(request):
+                self.update_single_glossary_term(request, glossary)
+                return Response(request.form['value'])
+            else:
+                glossary[request.form['term']] = request.form['description'] 
+                # write and re-read changed config file
+                self.sodocu.glossary.update_glossary()
+                return redirect('/glossary/')    
+        elif request.method == 'DELETE':
+            log.debug('request.method: DELETE')
+            glossary.pop(term, None)
+            # write and re-read changed config file
+            self.sodocu.glossary.update_glossary()
+            # JavaScript delete method requires text response "success" for removing table row
+            return Response('success', mimetype='text/plain')
+        else:
+            log.debug('request.method: UNKNOWN')
+
+
+    def update_single_glossary_term(self, request, glossary):
+        # update term or description
+        if request.form['attribute'] == 'term':
+            glossary[request.form['value']] = glossary.pop(request.form['id'])
+        elif request.form['attribute'] == 'description':
+            glossary[request.form['id']] = request.form['value']
+        # write and re-read changed config file
+        self.sodocu.glossary.update_glossary()
+
+
     def exists_username(self, request):
         '''
         Reads browser coockie for saved username.
@@ -307,6 +368,7 @@ class Gui(object):
                       
                       
     def is_single_attribute_update(self, request):
+        log.debug('is_single_attribute_update(' + str(request) + ')')
         return 'attribute' in request.form
                             
     

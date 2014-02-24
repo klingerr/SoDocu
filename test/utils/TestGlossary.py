@@ -16,7 +16,7 @@ class TestGlossary(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.sodocu_path = Config().get_sodocu_path()
-        self.glossary = Glossary()
+        self.glossary = Glossary(self.sodocu_path)
 
 
     @classmethod 
@@ -25,12 +25,12 @@ class TestGlossary(unittest.TestCase):
 
 
     def test_read_glossary(self):
-        self.glossary.read_glossary(self.sodocu_path)
+        self.glossary.get_entries()
         assert 'person' in self.glossary.get_entries()['stakeholder']
 
 
     def test_read_glossary_as_json(self):
-        self.glossary.read_glossary(self.sodocu_path)
+        self.glossary.get_entries()
         json_data = self.glossary.get_entries_as_json()
         python_data = json.loads(json_data)
 #         print 'json_data: ' + str(json_data) 

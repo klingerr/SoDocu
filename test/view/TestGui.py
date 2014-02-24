@@ -330,7 +330,7 @@ class TestGui(unittest.TestCase):
     @patch('src.view.Gui.Gui.check_valid_item_type')
     def test_on_json_glossary(self, mocked_check_valid_item_type):
         mocked_check_valid_item_type.return_value = True
-        self.sodocu.read_glossary_as_json.return_value = {"stakeholder":"person"}
+        self.sodocu.get_glossary_entries_as_json.return_value = {"stakeholder":"person"}
         
         builder = EnvironBuilder(method='GET', path='/glossary/json/')
         env = builder.get_environ()

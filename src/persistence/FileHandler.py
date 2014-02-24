@@ -71,17 +71,8 @@ class FileHandler(object):
 
 
     def write_file(self, item):
-        config = item.__config__()
-        try:
-            cfgfile = open(item.get_filename(), 'w')
-            try:
-                config.write(cfgfile)
-                return True
-            finally:
-                cfgfile.close()
-        except IOError:
-            log.warn("Error: can\'t find file or read data")
-        return False
+        item_config = item.__config__()
+        return write_file(item_config, item.get_filename())
 
 
     def get_config(self):
@@ -101,3 +92,16 @@ def read_file(filename):
     if len(dataset) == 0:
         raise ValueError("File not found!")
     return config
+
+
+def write_file(config, filename):
+    try:
+        cfgfile = open(filename, 'w')
+        try:
+            config.write(cfgfile)
+            return True
+        finally:
+            cfgfile.close()
+    except IOError:
+        log.warn("Error: can\'t find file or read data")
+    return False

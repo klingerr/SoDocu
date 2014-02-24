@@ -107,7 +107,7 @@ class TestSoDocu(unittest.TestCase):
    
    
     def test_read_glossary_as_json(self):
-        assert 'stakeholder' in str(self.sodocu.read_glossary_as_json())
+        assert 'stakeholder' in str(self.sodocu.get_glossary_entries_as_json())
         
   
 if __name__ == "__main__":
