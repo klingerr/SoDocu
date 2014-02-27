@@ -116,67 +116,67 @@ class Relations(object):
 
 
     def set_accomplished_by(self, value):
-        self.__accomplished_by = set(value.split(','))
+        self.__accomplished_by = set(value.replace(' ','').split(','))
 
 
     def set_accomplished_from(self, value):
-        self.__accomplished_from = set(value.split(','))
+        self.__accomplished_from = set(value.replace(' ','').split(','))
 
 
     def set_extracted_by(self, value):
-        self.__extracted_by = set(value.split(','))
+        self.__extracted_by = set(value.replace(' ','').split(','))
 
 
     def set_extracted_from(self, value):
-        self.__extracted_from = set(value.split(','))
+        self.__extracted_from = set(value.replace(' ','').split(','))
 
 
     def set_grouped_by(self, value):
-        self.__grouped_by = set(value.split(','))
+        self.__grouped_by = set(value.replace(' ','').split(','))
 
 
     def set_grouped_from(self, value):
-        self.__grouped_from = set(value.split(','))
+        self.__grouped_from = set(value.replace(' ','').split(','))
 
 
     def set_invented_by(self, value):
-        self.__invented_by = set(value.split(','))
+        self.__invented_by = set(value.replace(' ','').split(','))
 
 
     def set_invented_from(self, value):
-        self.__invented_from = set(value.split(','))
+        self.__invented_from = set(value.replace(' ','').split(','))
 
 
     def set_refined_by(self, value):
-        self.__refined_by = set(value.split(','))
+        self.__refined_by = set(value.replace(' ','').split(','))
 
 
     def set_refined_from(self, value):
-        self.__refined_from = set(value.split(','))
+        self.__refined_from = set(value.replace(' ','').split(','))
 
 
     def set_solved_by(self, value):
-        self.__solved_by = set(value.split(','))
+        self.__solved_by = set(value.replace(' ','').split(','))
 
 
     def set_solved_from(self, value):
-        self.__solved_from = set(value.split(','))
+        self.__solved_from = set(value.replace(' ','').split(','))
 
 
     def set_specified_by(self, value):
-        self.__specified_by = set(value.split(','))
+        self.__specified_by = set(value.replace(' ','').split(','))
 
 
     def set_specified_from(self, value):
-        self.__specified_from = set(value.split(','))
+        self.__specified_from = set(value.replace(' ','').split(','))
 
 
     def set_verified_by(self, value):
-        self.__verified_by = set(value.split(','))
+        self.__verified_by = set(value.replace(' ','').split(','))
 
 
     def set_verified_from(self, value):
-        self.__verified_from = set(value.split(','))
+        self.__verified_from = set(value.replace(' ','').split(','))
 
 
     def add_accomplished_by(self, value):
@@ -274,7 +274,9 @@ class Relations(object):
 
     def get_related_items_by_relation_name(self, relation_name):
         getter_method = getattr(self, 'get_' + relation_name)
-        return getter_method()
+        related_items = sorted(list(getter_method())) 
+        # encoding necessary for setting default values in relations at web single item form
+        return [x.encode('utf-8') for x in related_items]
 
 
     def __str__(self):

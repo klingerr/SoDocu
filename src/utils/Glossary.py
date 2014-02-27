@@ -46,7 +46,8 @@ class Glossary(object):
         for key in sorted(self.get_entries().keys()):
             entry_list.append({'term':key, 'description':self.get_entries()[key]})
         log.debug('entry_list: ' + str(entry_list))
-        return json.dumps(entry_list, indent=2)
+#         return json.dumps(entry_list, indent=2)
+        return json.dumps(entry_list)
 
 
     def add_entry(self, key, value):

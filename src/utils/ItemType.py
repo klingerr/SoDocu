@@ -54,7 +54,7 @@ class ItemType(object):
         return self.__valid_relations
 
 
-    def add_valid_relation(self,key, value):
+    def add_valid_relation(self, key, value):
         self.__valid_relations[key] = value
 
 
@@ -67,7 +67,7 @@ class ItemType(object):
 
 
     def __str__(self):
-        return 'name: ' + self.get_name() + ', path: ' + self.get_path() + ''
+        return 'ItemType {name: ' + self.get_name() + ', path: ' + self.get_path() + '}'
 
 
     def __repr__(self):

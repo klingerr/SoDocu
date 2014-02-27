@@ -14,7 +14,9 @@ from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import SharedDataMiddleware
+
 from src.utils.Utils import new_line_to_br, get_max_id, create_base_item, get_setter_method
+
 
 log = logging.getLogger(__name__)
 # console logger
@@ -63,12 +65,14 @@ class Gui(object):
             Rule('/', endpoint='new_url'),
             Rule('/<item_type_name>/', endpoint='item_list'),
             Rule('/<item_type_name>/<item_id>/', endpoint='single_item'),
+            # special URL for getting item types as JSON data for jquery autocomplete
+            Rule('/<item_type_name>/json/', endpoint='item_list_json'),
             # special URL for entering or changing current username
             Rule('/user/', endpoint='user'),
             # special URL for searching over all items
             Rule('/search/', endpoint='search'),
             # special URL for getting glossary entries as json data
-            Rule('/glossary/json/', endpoint='json_glossary'),
+            Rule('/glossary/json/', endpoint='glossary_json'),
             # special URL for getting glossary entries for editing in frontend
             Rule('/glossary/', endpoint='glossary'),
             Rule('/glossary/<term>/', endpoint='glossary_term')
@@ -115,7 +119,7 @@ class Gui(object):
         self.check_valid_item_type(item_type_name)
         if request.method == 'GET':
             log.debug('request.method: GET')
-            item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+            item_type = self.get_sodocu().get_config().get_item_type_by_name(item_type_name)
             template = item_type.get_table_template()
             items = self.sodocu.get_items_by_type(item_type)
             return self.render_all_item_as_table(template, item_type_name, items)
@@ -132,7 +136,7 @@ class Gui(object):
         '''
         log.debug('on_single_item(' + str(request) + ', ' + item_type_name + ', ' + item_id + ')')
         self.check_valid_item_type(item_type_name)
-        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+        item_type = self.get_sodocu().get_config().get_item_type_by_name(item_type_name)
         
         if request.method == 'GET':
             log.debug('request.method: GET')
@@ -180,10 +184,16 @@ class Gui(object):
             return self.render_all_item_as_table('generic_table.html', 'search result', search_results)
       
     
-    def on_json_glossary(self, request):
-        log.debug('on_json_glossary(' + str(request) + ')')
+    def on_glossary_json(self, request):
+        log.debug('on_glossary_json(' + str(request) + ')')
         if request.method == 'GET':
             return Response(self.sodocu.get_glossary_entries_as_json(), mimetype='application/json')
+    
+    
+    def on_item_list_json(self, request, item_type_name):
+        log.debug('on_item_list_json(' + str(request) + ', ' + item_type_name + ')')
+        if request.method == 'GET':
+            return Response(self.sodocu.get_items_by_type_name_as_json(item_type_name), mimetype='application/json')
     
     
     def on_glossary(self, request):
@@ -283,8 +293,10 @@ class Gui(object):
     def render_one_item_as_form(self, item):
         log.debug('render_one_item_as_form(' + str(item) + ')')
         item_type = item.get_item_type()
+        relations = self.sodocu.get_relations_by_item(item)
         return self.render_template(item_type.get_form_template(), 
                                     item=item,
+                                    relations=relations,
                                     item_type=item_type.get_name(),
                                     user=self.get_user(),
                                     valid_item_types=self.get_sodocu().get_config().get_item_types())
@@ -319,7 +331,7 @@ class Gui(object):
     
     def create_or_update_item(self, request, item_type_name, item_id):
         log.debug('create_or_update_item(' + str(request) + ', ' + item_type_name + ', ' + item_id+ ')')
-        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+        item_type = self.get_sodocu().get_config().get_item_type_by_name(item_type_name)
         item = self.sodocu.get_item_by_id(item_type, item_id)
         log.debug('item: ' + str(item))
         if item is not None:
@@ -350,11 +362,17 @@ class Gui(object):
                 log.debug('setter_method: ' + str(setter_method))
                 setter_method(''.join(request.form.getlist(key)))
             except AttributeError:
-                log.info('Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
+                log.info('1. Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
+                try:
+                    setter_method = get_setter_method(item.get_relations(), key)
+                    log.debug('setter_method: ' + str(setter_method))
+                    setter_method(''.join(request.form.getlist(key)))
+                except AttributeError:
+                    log.info('2. Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
 
 
     def get_item_by_name(self, item_type_name, item_id):
-        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+        item_type = self.get_sodocu().get_config().get_item_type_by_name(item_type_name)
         return self.get_sodocu().get_item_by_id(item_type, item_id)
 
     

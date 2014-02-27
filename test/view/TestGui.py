@@ -99,7 +99,7 @@ class TestGui(unittest.TestCase):
                 
     @patch('src.view.Gui.Gui.exists_username')        
     @patch('src.view.Gui.Gui.on_search')        
-    def test_dispatch_json_glossary(self, mocked_method, mocked_exists_username):
+    def test_dispatch_glossary_json(self, mocked_method, mocked_exists_username):
         mocked_method.return_value = None
         mocked_exists_username.return_value = True
         builder = EnvironBuilder(path='/glossary/json/')
@@ -107,7 +107,7 @@ class TestGui(unittest.TestCase):
         request = Request(env)
 #         print 'request: ' + str(request)
         self.gui.dispatch_request(request)
-        assert str(self.gui.get_endpoint()) == 'json_glossary'
+        assert str(self.gui.get_endpoint()) == 'glossary_json'
         
                 
     def test_is_put_request_get(self):
@@ -328,7 +328,7 @@ class TestGui(unittest.TestCase):
 
 
     @patch('src.view.Gui.Gui.check_valid_item_type')
-    def test_on_json_glossary(self, mocked_check_valid_item_type):
+    def test_on_glossary_json(self, mocked_check_valid_item_type):
         mocked_check_valid_item_type.return_value = True
         self.sodocu.get_glossary_entries_as_json.return_value = {"stakeholder":"person"}
         
@@ -336,8 +336,8 @@ class TestGui(unittest.TestCase):
         env = builder.get_environ()
         request = Request(env)
         
-#         print str(self.gui.on_json_glossary(request).data)
-        assert 'stakeholder' in str(self.gui.on_json_glossary(request).data) 
+#         print str(self.gui.on_glossary_json(request).data)
+        assert 'stakeholder' in str(self.gui.on_glossary_json(request).data) 
   
 
 if __name__ == "__main__":

@@ -34,12 +34,13 @@ class Test(unittest.TestCase):
          
  
     def test_get_item_type_valid(self):
-        assert self.config.get_item_type('idea').get_name() == 'idea'
+        assert self.config.get_item_type_by_name('idea').get_name() == 'idea'
          
  
     def test_get_item_type_exception(self):
-        with self.assertRaises(Exception):
-            self.config.get_item_type('invalid')
+#         with self.assertRaises(Exception):
+#             self.config.get_item_type_by_name('invalid')
+        assert self.config.get_item_type_by_name('invalid') == None
          
  
     def test_read_config(self):

@@ -84,7 +84,7 @@ def create_item(sodocu_config, item_config, filename):
     log.debug("item_config.get(item_type_name, 'id'): " + item_config.get(item_type_name, 'id'))
     log.debug("item_config.get(item_type_name, 'name'): " + item_config.get(item_type_name, 'name'))
     
-    item = create_base_item(sodocu_config.get_item_type(item_type_name), item_config.get(item_type_name, 'id'), item_config.get(item_type_name, 'name'))
+    item = create_base_item(sodocu_config.get_item_type_by_name(item_type_name), item_config.get(item_type_name, 'id'), item_config.get(item_type_name, 'name'))
     item.set_filename(filename) 
     
     for section in item_config.sections():

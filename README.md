@@ -22,7 +22,10 @@ SoDocu itself is documented by SoDocu. So can see your first example directly
 at folder "sodocu".
 
 # Inspiration
-SoDocu is inspired by rmtoo: http://www.flonatel.de/projekte/rmtoo/
+SoDocu is inspired by:
+* http://www.arc42.de/template/template.html
+* http://easyrequirement.blogspot.de/
+* http://www.flonatel.de/projekte/rmtoo/
 
 # Installation
 * install [Python 2.7.x](http://www.python.org/):
@@ -56,7 +59,8 @@ TODO
 * ~~editor for glossary entries~~
 * eat your own dog food - create sodocu items
 * ~~full text search over all item types~~
-* fill relations between items
+* ~~fill relations between items~~
+* create backward (from) relations automaticly
 * dashboard shown known issues i.e.: missing relations
 * graphical models for requirements (UML), targets (mind map) and system context (SysML)
 * dependency between model and item

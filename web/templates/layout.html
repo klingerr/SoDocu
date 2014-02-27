@@ -5,13 +5,24 @@
 <!-- Bootstrap -->
 <link rel="stylesheet" href="/css/bootstrap.css">
 <link rel="stylesheet" href="/css/bootstrap-theme.css">
+
+<!-- layout for dashboard boostrap style -->
 <link rel="stylesheet" href="/css/dashboard.css">
-<link rel="stylesheet" href="/css/sticky-footer.css">
- <!-- @see: https://github.com/Jowin/Datatables-Bootstrap3 -->
+
+<!-- <link rel="stylesheet" href="/css/sticky-footer.css"> -->
+<!-- @see: https://github.com/Jowin/Datatables-Bootstrap3 -->
 <link rel="stylesheet" href="/css/bootstrap.datatables.css">
 <link rel="stylesheet" href="/css/tooltip.css">
+
+<!-- autocomplete via selectize.js -->
+<link rel="stylesheet" type="text/css" href="/css/selectize.css" />      
+<link rel="stylesheet" type="text/css" href="/css/selectize.bootstrap3.css" />      
       
 <script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
+<!-- <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script> -->
+
+<!-- autocomplete via selectize.js -->
+<script type="text/javascript" src="/js/selectize.min.js"></script>
 
 <!-- DataTables with jEdit-Plugin for inline table editing 
 @see: http://www.dzone.com/links/r/creating_perfect_tables_with_datatables_and_jedit.html
@@ -20,18 +31,25 @@
 -->
 <script type="text/javascript" src="/js/jquery.datatables.js"></script>
 <script type="text/javascript" src="/js/jquery.jeditable.js"></script>
-
+<!-- automatic sizing of inline editable textarea -->
 <script type="text/javascript" src="/js/autogrow.min.js"></script>
 <script type="text/javascript" src="/js/jquery.jeditable.autogrow.js"></script>
 
-<script type="text/javascript" src="/js/jquery.blockui.js"></script>
+<!-- <script type="text/javascript" src="/js/jquery.blockui.js"></script> -->
+
+<!-- Bootstrap -->
 <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/docs.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap.datatables.js"></script>
+
+<!-- circle imgages as placeholder in dashboard -->
+<script type="text/javascript" src="/js/docs.min.js"></script>
+
 <!-- for delete confirmation dialog
 @see: http://bootboxjs.com/
  -->
 <script type="text/javascript" src="/js/bootbox.min.js"></script>
+
+<!-- explain glossary terms as tooltip within text -->
 <script type="text/javascript" src="/js/tooltip.js"></script>
 <script type="text/javascript" src="/js/jquery.glossarize.js"></script>
 
@@ -48,6 +66,8 @@ $(document).ready(function() {
 		"aoColumnDefs": [{ "sType": "string", "aTargets": [0] }]
 	});
 
+	
+	// table inline editing by input field
 	$(".editable", oTable.fnGetNodes()).editable("", {
 		method: "PUT",
         tooltip: "Click to edit",
@@ -72,6 +92,8 @@ $(document).ready(function() {
 		"height": "14px"
 	});
 
+	
+	// table inline editing by autogrowing textarea
 	$(".growable", oTable.fnGetNodes()).editable("", {
 		type: "autogrow",
 		method: "PUT",
@@ -103,7 +125,8 @@ $(document).ready(function() {
 		}
 	});
 
-
+	
+	// called by pressing delete button
 	$(document).on("click", ".delete", function() {
 		var item_id = this.parentNode.parentNode.getAttribute("id");
 		var parent = $("#"+item_id);
@@ -147,6 +170,8 @@ $(document).ready(function() {
 	});
 });
 
+
+// merging datatable and bootstrap css classes
 $.extend( $.fn.dataTableExt.oStdClasses, {
     "sWrapper": "dataTables_wrapper form-inline"
 });
@@ -175,6 +200,7 @@ $(function(){
 
 </script>
  
+ 	<!-- horizontal menu bar -->
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container-fluid">
       
@@ -208,6 +234,8 @@ $(function(){
       </div>
     </div>
 
+
+ 	<!-- left vertical menu bar -->
     <div class="container-fluid">
       <div class="row">
 
@@ -231,11 +259,3 @@ $(function(){
 	     </div>
       </div>
     </div>
-    
- <!--     
-	<div id="footer">
-      <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
-      </div>
-    </div>
- -->    

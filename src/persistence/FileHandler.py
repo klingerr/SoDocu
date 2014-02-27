@@ -28,18 +28,20 @@ class FileHandler(object):
         
 
     def create_file(self, item):
+        log.debug('create_file(' + str(item) + ')')
         filename = item.get_camel_case_name() + self.file_extension
         directory = self.create_directory(item)
         if directory is not None:
             item.set_filename(directory + '/' + filename)
-            log.debug('writing file: ' + item.get_filename())
+            log.info('writing file: ' + item.get_filename())
             return self.write_file(item)
         return False
 
 
     def update_file(self, item):
-        log.debug('item.get_camel_case_name(): ' + item.get_camel_case_name())
-        log.debug('get_file_basename(item.get_filename()): ' + str(get_file_basename(item.get_filename())))
+        log.debug('update_file(' + str(item) + ')')
+#         log.debug('item.get_camel_case_name(): ' + item.get_camel_case_name())
+#         log.debug('get_file_basename(item.get_filename()): ' + str(get_file_basename(item.get_filename())))
         if get_file_basename(item.get_filename()) is None:
             return self.create_file(item)
         elif item.get_camel_case_name() != get_file_basename(item.get_filename()):
@@ -51,7 +53,7 @@ class FileHandler(object):
 
 
     def delete_file(self, item):
-        log.debug('deleting file: ' + item.get_filename())
+        log.debug('delete_file: ' + item.get_filename())
         try:
             os.remove(item.get_filename())
             return True
@@ -61,7 +63,7 @@ class FileHandler(object):
 
 
     def create_directory(self, item):
-        item_type = self.get_config().get_item_type(item.__class__.__name__.lower())
+        item_type = self.get_config().get_item_type_by_name(item.__class__.__name__.lower())
         directory = os.path.join(self.get_config().get_sodocu_path(), item_type.get_path())
         log.debug('directory: ' + directory)
         if not os.path.exists(directory):
@@ -71,6 +73,7 @@ class FileHandler(object):
 
 
     def write_file(self, item):
+        log.debug('write_file(' + str(item) + ')')
         item_config = item.__config__()
         return write_file(item_config, item.get_filename())
 
@@ -86,8 +89,8 @@ def read_file(filename):
     Reads a textfile as a config file from filesystem and returns its 
     content as a config.
     '''
+    log.info('read_file(' + filename + ')')
     config = ConfigParser.ConfigParser()
-    log.debug('reading file: ' + filename)
     dataset = config.read(filename)
     if len(dataset) == 0:
         raise ValueError("File not found!")
@@ -95,6 +98,7 @@ def read_file(filename):
 
 
 def write_file(config, filename):
+    log.info('write_file(' + str(config) + ', ' + filename + ')')
     try:
         cfgfile = open(filename, 'w')
         try:

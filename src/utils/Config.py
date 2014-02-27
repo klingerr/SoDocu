@@ -24,7 +24,7 @@ class Config(object):
 
     def __init__(self):
         '''
-        Reads the current configuration from sodocu.json. 
+        Reads the current configuration from sodocu.conf. 
         '''
         self.__sodocu_path = None
         # set of unique item types
@@ -72,12 +72,14 @@ class Config(object):
         return False
     
     
-    def get_item_type(self, type_name):
+    def get_item_type_by_name(self, item_type_name):
+        log.debug('get_item_type_by_name(' + item_type_name + ')')
         for item_type in self.get_item_types():
-            if item_type.get_name() == type_name:
+            log.debug('item_type: ' + str(item_type))
+            if item_type.get_name() == item_type_name:
                 return item_type
-        log.warn('Item type <' + type_name + '> is not valid!')
-        raise Exception('Item type <' + type_name + '> is not valid!')
+        log.warn('Item type <' + item_type_name + '> is not valid!')
+#         raise Exception('Item type <' + item_type_name + '> is not valid!')
     
  
     def read_config(self):
@@ -90,7 +92,7 @@ class Config(object):
         self.clear_item_types()
         for section in config.sections():
             if section != 'main':
-                # fix optionen    
+                # fix options
                 item_type = ItemType(section, config.get(section, 'path'))
                 item_type.set_menu_position(config.get(section, 'menu_position'))
                 item_type.set_form_template(config.get(section, 'form_template'))

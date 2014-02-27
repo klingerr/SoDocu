@@ -1,6 +1,26 @@
 {% extends "layout.html" %}
 {% block title %}New {{ item_type }}{% endblock %}
 {% block body %}
+
+<script type="text/javascript">
+/*
+ * add new row with autocomplete input field to given relations table
+function addRowToRelationsTable(table_id) {
+	var row_content = '<div class="form-inline">'
+		row_content += '  <input type="text" id="test" data-provide="typeahead" class="form-control" autocomplete="off" />'
+		row_content += '  <a href="#" onclick="" class="btn btn-primary btn-xs" role="button" title="save {{ key }} relation">'      
+		row_content += '    <span class="glyphicon glyphicon-ok"></span>'
+		row_content += '  </a>'
+		row_content += '  <a href="/{{ item_type }}/{{ item.id }}/">Cancel</a>'
+		row_content += '</div>'
+
+ 	$("#" + table_id).append("<tr><td colspan='4'>" + row_content + "</td></tr>");
+}
+ */
+
+</script>
+
+
   <h2>
     {% if item.name == '' %}
       Create new 
@@ -26,13 +46,12 @@
 		    </tr>
 		    <tr>
 		      <td>name</td>
-		      <td><input type="text" name="name" value="{{ item.name }}"></td>
+		      <td><input type="text" name="name" value="{{ item.name }}" class="form-control"></td>
 		    </tr>
 		    <tr>
 		      <td>description</td>
-		      <td><textarea name="description" cols="60" rows="7">{{ item.description }}</textarea></td>
+		      <td><textarea name="description" cols="60" rows="7" class="form-control">{{ item.description }}</textarea></td>
 		    </tr>
-		    
 		    
 		    
 		    <tr>
@@ -45,43 +64,45 @@
 	    		{{ key }}
    		      </td>
 		      <td>
-			    {%- for related_item in item.relations.get_related_items_by_relation_name(key) %}
-			    	{{ related_item.id }}
-	    		{%- endfor %}
+		        <!-- {{ item.relations.get_related_items_by_relation_name(key)|safe }} -->
+				<input type="text" id="input_{{ key }}" name="{{ key }}" class="demo-default form-control" />
+				
+				<script type="text/javascript">
+					/* @see: https://github.com/brianreavis/selectize.js/issues/15 */				
+					var $selectize_{{ key }} = $('#input_{{ key }}').selectize({
+					    plugins: {'remove_button': {append: false}},
+					    create:       false,
+					    hideSelected: true,
+					    labelField:   'label',
+					    valueField:   'id',
+					    searchField:  ['id', 'label'],
+					    /* maxItems:     1, */
+					    preload:      true,
+					    render:       {
+					        item: function(data) {
+					            return '<div class="item" title="' + escape(data.label) + '"><a href="/' + escape(data.id).split('-')[0] + '/' + escape(data.id) + '/" >' + escape(data.id) +  '</a><div class="remove">&times;</div></div>';
+					        }
+					    },
+					    load: function(query, callback) {
+					    	/* console.log("load called"); */
+					        $.ajax({
+					            url: '/{{ item.item_type.valid_relations[key] }}/json/',
+					            dataType: 'json',
+					            success: function(data) {
+					            	/* console.log(data); */
+					                callback(data);
+					            }
+					        });
+					    }				
+					});
+					
+					/* set exiting realtions, needs te e delayed because of aynchronous ajax call */
+					setTimeout(function() { $selectize_{{ key }}[0].selectize.setValue({{ item.relations.get_related_items_by_relation_name(key)|safe }}); }, 1000);
+				</script>
    		      </td>
 		    </tr>
     		{%- endfor %}
 		    
-		    <tr>
-		      <td>invented by (stakeholder)</td>
-		      <td>
-				<select name="stakeholder" size="1">
-			      <option value="None"></option>
-			      <option value="stakeholder-1">Developer</option>
-			      <option value="stakeholder-2">Tester</option>
-			    </select>
-   		      </td>
-		    </tr>
-		    <tr>
-		      <td>grouped by (topic)</td>
-		      <td>
-				<select name="topic" size="1">
-			      <option value="None"></option>
-			      <option value="topic-1">Persistence</option>
-			      <option value="topic-2">Stakeholder Analysis</option>
-			    </select>
-   		      </td>
-		    </tr>
-		    <tr>
-		      <td>specified by (user story)</td>
-		      <td>
-				<select name="userStory" size="1">
-			      <option value="None"></option>
-			      <option value="userStory-1">bla</option>
-			      <option value="userStory-2">bli</option>
-			    </select>
-   		      </td>
-		    </tr>
  	    </table>
 	</div>
     

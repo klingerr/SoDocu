@@ -4,12 +4,14 @@ Created on 03.02.2014
 @author: RKlinger
 '''
 
+import json
 import logging.config
 
 from src.persistence.DirectoryWalker import DirectoryWalker
 from src.persistence.FileHandler import FileHandler, read_file
 from src.utils.Config import Config
 from src.utils.Glossary import Glossary
+from src.utils.ItemType import ItemType
 from src.utils.Utils import create_item, get_setter_method
 from src.view.Gui import create_gui
 
@@ -69,11 +71,22 @@ class SoDocu(object):
 
 
     def get_items_by_type(self, item_type):
+        log.debug('get_items_by_type(' + str(item_type) + ')')
         try:
             return self.__items[item_type.get_name()]
         except KeyError:
             log.info('There are no items of type <' + item_type + '>')
         return None
+
+
+    def get_items_by_type_name_as_json(self, item_type_name):
+        item_list = []
+        for item in self.get_items_by_type(ItemType(item_type_name, '')):
+            item_list.append({'label':item.name, 'id':item.id})
+#             item_list.append({'label':item.name})
+        log.debug('item_list: ' + str(item_list))
+        return json.dumps(item_list, indent=2)
+#         return json.dumps(item_list)
 
 
     def add_item(self, item):
@@ -113,20 +126,22 @@ class SoDocu(object):
         log.debug('get_item_by_id(' + str(item_type) + ', ' + str(identifier) + ')') 
         items = self.get_items_by_type(item_type)
         if items is None:
-            log.debug('item: ' + str(None)) 
+            log.debug('items: ' + str(None)) 
             return None
         
         for item in items:
+            log.debug('item: <' + item.get_id() + '> identifier: <' + identifier + '>') 
             if item.get_id() == identifier:
-                log.debug('item: ' + str(item)) 
                 return item
 
 
     def save_item(self, item):
+        log.info('save_item(' + str(item) + ')')
         return self.get_file_handler().update_file(item)
         
         
     def delete_item(self, item):
+        log.info('delete_item(' + str(item) + ')')
         if self.get_file_handler().delete_file(item):
             return self.remove_item(item)
         return False
@@ -151,7 +166,7 @@ class SoDocu(object):
     def search(self, search_string):
         results = set()
         for key in self.get_items().keys():
-            item_type = self.get_config().get_item_type(key)
+            item_type = self.get_config().get_item_type_by_name(key)
             for value in self.get_items_by_type(item_type):
                 if value.contains_text(search_string):
                     results.add(value)
@@ -165,6 +180,26 @@ class SoDocu(object):
     def get_glossary_entries(self):
         return self.get_glossary().get_entries()
         
+
+    def get_relations_by_item(self, item):
+        log.debug('get_relations_by_item(' + str(item) + ')')
+        relations = dict()
+        
+        for valid_relation_type in item.item_type.valid_relations.keys(): 
+            log.debug('valid_relation_type: ' + valid_relation_type)
+            items = []
+            for item_id in item.relations.get_related_items_by_relation_name(valid_relation_type):
+                log.debug('item_id: ' + item_id)
+                if item_id and item_id != '':
+                    item_type = self.config.get_item_type_by_name(item_id.split('-')[0].strip())
+                    related_item = self.get_item_by_id(item_type, item_id.strip())
+                    log.debug('related_item: ' + str(related_item))
+                    if related_item != None:
+                        items += [related_item]
+                    log.debug('items: ' + str(items))
+            relations[valid_relation_type] = items
+        return relations
+    
 
 if __name__ == '__main__':
     logging.config.fileConfig('logging.conf', disable_existing_loggers=False)

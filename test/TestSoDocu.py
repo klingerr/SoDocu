@@ -109,7 +109,24 @@ class TestSoDocu(unittest.TestCase):
     def test_read_glossary_as_json(self):
         assert 'stakeholder' in str(self.sodocu.get_glossary_entries_as_json())
         
-  
+    
+    def test_get_items_by_type(self):
+        item_list = self.sodocu.get_items_by_type(ItemType('idea', ''))
+#         print 'item_list: ' + str(item_list)
+        assert len(item_list) > 0
+    
+    
+    def test_get_items_by_type_as_json(self):
+        item_list_json = self.sodocu.get_items_by_type_name_as_json('idea')
+#         print 'item_list_json: ' + str(item_list_json)
+        assert len(item_list_json) > 0
+    
+    
+    def test_search(self):
+        items = self.sodocu.search('tester')
+        assert len(items) > 0
+        
+    
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
