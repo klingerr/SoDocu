@@ -60,7 +60,7 @@ TODO
 * eat your own dog food - create sodocu items
 * ~~full text search over all item types~~
 * ~~fill relations between items~~
-* create backward (from) relations automaticly
+* ~~create backward (from) relations automaticly~~
 * dashboard shown known issues i.e.: missing relations
 * graphical models for requirements (UML), targets (mind map) and system context (SysML)
 * dependency between model and item

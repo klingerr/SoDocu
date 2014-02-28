@@ -109,6 +109,16 @@ class TestGui(unittest.TestCase):
         self.gui.dispatch_request(request)
         assert str(self.gui.get_endpoint()) == 'glossary_json'
         
+        
+    @patch('src.view.Gui.Gui.render_template')
+    def test_on_search(self, mocked_render_template):
+        mocked_render_template.return_value = True
+
+        builder = EnvironBuilder(method='POST', data={'search_string': 'tester'})
+        env = builder.get_environ()
+        request = Request(env)
+        assert self.gui.on_search(request)
+        
                 
     def test_is_put_request_get(self):
         builder = EnvironBuilder(method='GET')
@@ -189,20 +199,21 @@ class TestGui(unittest.TestCase):
         assert idea.get_description() == 'new description'
       
       
-    @patch('src.utils.Utils.create_base_item')
-    def test_create_or_update_item_new(self, mocked_create_base_item):
-#         print str(mocked_create_base_item)
-        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
-        mocked_create_base_item.return_value = idea
-               
-        self.sodocu.save_item.return_value = True
-        self.sodocu.get_item_by_id.return_value = None
-               
-#         builder = EnvironBuilder(method='POST', data={'id': 'idea-1', 'name':'updated name', 'description':'new description', 'bla':'bli'})
+#     @patch('src.utils.Utils.create_base_item')
+#     def test_create_or_update_item_new(self, mocked_create_base_item):
+# #         print str(mocked_create_base_item)
+#         idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
+#         mocked_create_base_item.return_value = idea
+#                
+#         self.sodocu.save_item.return_value = True
+#         self.sodocu.get_item_by_id.return_value = None
+#         self.sodocu.get_config.get_item_type_by_name.return_value = ItemType('idea', '')
+#                
+#         builder = EnvironBuilder(method='POST', data={'id': 'idea-5', 'name':'updated name', 'description':'new description', 'bla':'bli'})
 #         env = builder.get_environ()
 #         request = Request(env)
-                
-#         self.gui.create_or_update_item(request, 'idea', 'idea-1')
+#                 
+#         self.gui.create_or_update_item(request, 'idea', 'idea-5')
         # assertion not possible because of mocking SoDocu
 #         assert idea.get_name() == 'updated name'
 #         assert idea.get_description() == 'new description'
@@ -220,6 +231,36 @@ class TestGui(unittest.TestCase):
         assert idea.get_description() == 'new description'
       
       
+    @patch('src.view.Gui.Gui.render_template')
+    @patch('src.view.Gui.Gui.check_valid_item_type')
+    def test_on_single_item_get(self, mocked_check_valid_item_type, mocked_render_template):
+        mocked_check_valid_item_type.return_value = True
+        mocked_render_template.return_value = True
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
+        self.sodocu.get_item_by_id.return_value = idea
+        builder = EnvironBuilder(method='GET', path='/idea/idea-1/')
+        env = builder.get_environ()
+        request = Request(env)
+                
+        response = self.gui.on_single_item(request, 'idea', 'idea-1')
+#         print str(response)
+        assert response
+             
+     
+    @patch('src.view.Gui.Gui.check_valid_item_type')
+    def test_on_single_item_unknown_request_type(self, mocked_check_valid_item_type):
+        mocked_check_valid_item_type.return_value = True
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
+        self.sodocu.get_item_by_id.return_value = idea
+
+        builder = EnvironBuilder(method='UNKNOWN', path='/idea/idea-1/')
+        env = builder.get_environ()
+        request = Request(env)
+                
+        with self.assertRaises(Exception):
+            self.gui.on_single_item(request, 'idea', 'idea-1')
+
+     
     @patch('src.view.Gui.Gui.check_valid_item_type')
     def test_on_single_item_put_attribute(self, mocked_check_valid_item_type):
         mocked_check_valid_item_type.return_value = True
@@ -338,8 +379,102 @@ class TestGui(unittest.TestCase):
         
 #         print str(self.gui.on_glossary_json(request).data)
         assert 'stakeholder' in str(self.gui.on_glossary_json(request).data) 
+
+
+    def test_on_item_list_json(self):
+        builder = EnvironBuilder(method='GET')
+        env = builder.get_environ()
+        request = Request(env)
+        response = self.gui.on_item_list_json(request, 'idea')
+#         print response 
+        assert 'OK' in str(response)
   
 
+    @patch('src.view.Gui.Gui.render_template')
+    def test_on_glossary_get(self, mocked_render_template):
+        mocked_render_template.return_value = True
+
+        builder = EnvironBuilder(method='GET', path='/glossary/')
+        env = builder.get_environ()
+        request = Request(env)
+        response = self.gui.on_glossary(request)
+#         print response
+        assert response
+  
+
+    @patch('src.view.Gui.Gui.render_template')
+    def test_on_glossary_post(self, mocked_render_template):
+        mocked_render_template.return_value = True
+
+        builder = EnvironBuilder(method='POST', data={'term': 'test'})
+        env = builder.get_environ()
+        request = Request(env)
+        response = self.gui.on_glossary(request)
+#         print response
+        assert response
+  
+
+    def test_on_glossary_term_put_entry(self):
+        self.sodocu.get_glossary_entries.return_value = {"stakeholder":"person"}
+        builder = EnvironBuilder(method='POST', data={'_method': 'put', 'term': 'bla', 'description': 'bli'})
+        env = builder.get_environ()
+        request = Request(env)
+        response = self.gui.on_glossary_term(request, 'test')
+#         print response.data
+        assert 'href="/glossary/"' in str(response.data)
+                
+        
+    def test_on_glossary_term_put_attribute(self):
+        self.sodocu.get_glossary_entries.return_value = {"stakeholder":"person"}
+        builder = EnvironBuilder(method='POST', data={'_method': 'put', 'attribute': 'id', 'value': 'bli'})
+        env = builder.get_environ()
+        request = Request(env)
+        response = self.gui.on_glossary_term(request, 'id')
+#         print response.data
+        assert 'bli' in str(response.data)
+                
+        
+    def test_on_glossary_term_delete(self):
+        self.sodocu.get_glossary_entries.return_value = {"stakeholder":"person"}
+        builder = EnvironBuilder(method='DELETE', data={'id': 'bla'})
+        env = builder.get_environ()
+        request = Request(env)
+        response = self.gui.on_glossary_term(request, 'id')
+#         print response.data
+        assert 'success' in str(response.data)
+                
+        
+    def test_on_glossary_term_unknown(self):
+        self.sodocu.get_glossary_entries.return_value = {"stakeholder":"person"}
+        builder = EnvironBuilder(method='UNKNOWN', path='/glossary/')
+        env = builder.get_environ()
+        request = Request(env)
+        with self.assertRaises(Exception):
+            self.gui.on_glossary_term(request, 'id')
+                
+        
+    def test_update_single_glossary_term_id(self):
+        self.sodocu.get_glossary.return_value = True
+        glossary = {"stakeholder":"person"}
+        builder = EnvironBuilder(method='POST', data={'_method': 'put', 'attribute': 'id', 'value': 'bli'})
+        env = builder.get_environ()
+        request = Request(env)
+        assert self.gui.update_single_glossary_term(request, glossary) == None
+                
+        
+    @patch('src.view.Gui.Gui.check_valid_item_type')
+    @patch('src.view.Gui.Gui.render_new_item_as_form')
+    def test_render_new_item_as_form(self, mocked_render_new_item_as_form, mocked_check_valid_item_type):
+        mocked_check_valid_item_type.return_value = True
+        mocked_render_new_item_as_form.return_value = True
+        assert self.gui.render_new_item_as_form('idea')
+        
+
+    def test_update_from_relation(self):
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')        
+        assert self.gui.update_from_relations(idea, 'invented_by', ['stakeholder-1']) == None
+        
+    
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

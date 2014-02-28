@@ -75,7 +75,7 @@ class SoDocu(object):
         try:
             return self.__items[item_type.get_name()]
         except KeyError:
-            log.info('There are no items of type <' + item_type + '>')
+            log.info('There are no items of type <' + str(item_type) + '>')
         return None
 
 
@@ -126,12 +126,12 @@ class SoDocu(object):
         log.debug('get_item_by_id(' + str(item_type) + ', ' + str(identifier) + ')') 
         items = self.get_items_by_type(item_type)
         if items is None:
-            log.debug('items: ' + str(None)) 
+            log.debug('return: ' + str(None)) 
             return None
         
         for item in items:
-            log.debug('item: <' + item.get_id() + '> identifier: <' + identifier + '>') 
             if item.get_id() == identifier:
+                log.debug('return item: ' + str(item)) 
                 return item
 
 

@@ -83,8 +83,9 @@ class Glossary(object):
 
         
     def update_glossary(self):
-        self.write_glossary()
-        self.read_glossary()
+        if self.write_glossary():
+            self.read_glossary()
+        return False
 
 
     entries = property(get_entries, None, None, None)

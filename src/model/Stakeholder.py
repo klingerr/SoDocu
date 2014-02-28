@@ -19,12 +19,17 @@ class Stakeholder(AbstractItem):
         '''
         super(Stakeholder, self).__init__(item_type, identity, name)
         
-    def __str__(self):
-        return 'Stakeholder {' + AbstractItem.__str__(self) + str(self.get_meta_data()) + '}' 
-
-
+        
     def __config__(self):
-        meta_config = self.get_meta_data().__config__()
         abstract_config = AbstractItem.__config__(self)
-        config = merge_item_configs(meta_config, abstract_config)
+        meta_config = self.get_meta_data().__config__()
+        relations_config = self.get_relations().__config__()
+        config = merge_item_configs(abstract_config, meta_config)
+        config = merge_item_configs(config, relations_config)
         return config        
+
+
+    def __str__(self):
+        return 'Stakeholder {' + AbstractItem.__str__(self) \
+                               + self.get_meta_data().__str__() \
+                               + self.get_relations().__str__() + '}' 

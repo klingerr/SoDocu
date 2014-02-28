@@ -11,7 +11,7 @@ from src.model.Stakeholder import Stakeholder
 from src.utils.Config import Config
 from src.utils.ItemType import ItemType
 from src.utils.Utils import make_camel_case, get_file_basename, get_max_id, create_base_item,\
-    create_item
+    create_item, get_adder_method, get_setter_method
 
 
 class Test(unittest.TestCase):
@@ -70,6 +70,20 @@ class Test(unittest.TestCase):
 #         print 'item.get_relations().get_invented_by(): ' + str(item.get_relations().get_invented_by())
         assert 'stakeholder-1' in str(item.get_relations().get_invented_by())
             
+
+    def test_get_setter_method(self):
+        idea = create_base_item(ItemType('idea', ''), 'idea-1', 'idea name')
+        setter_method = get_setter_method(idea.get_relations(), 'invented_by')
+#         print setter_method
+        assert 'set_invented_by' in str(setter_method)
+        
+
+    def test_get_adder_method(self):
+        idea = create_base_item(ItemType('idea', ''), 'idea-1', 'idea name')
+        adder_method = get_adder_method(idea.get_relations(), 'invented_from')
+#         print adder_method
+        assert 'add_invented_from' in str(adder_method)
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

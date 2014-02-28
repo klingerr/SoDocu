@@ -47,7 +47,7 @@
       <td class="growable">{{ item.description }}</td>
       <td>
 	    {%- for related_item in item.relations.existing_relations %}
-	    	{{ related_item }}
+	    	<a href="/{{ related_item.split('-')[0] }}/{{ related_item }}/">{{ related_item }}</a>
     	{%- endfor %}
       </td>
       <td>{{ item.meta_data.createdBy }} / {{ item.meta_data.createdAt }}</td>

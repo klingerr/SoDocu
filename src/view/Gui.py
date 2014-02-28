@@ -15,7 +15,9 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import SharedDataMiddleware
 
-from src.utils.Utils import new_line_to_br, get_max_id, create_base_item, get_setter_method
+from src.utils.ItemType import ItemType
+from src.utils.Utils import new_line_to_br, get_max_id, create_base_item, \
+                            get_getter_method, get_setter_method, get_adder_method
 
 
 log = logging.getLogger(__name__)
@@ -154,7 +156,8 @@ class Gui(object):
             # JavaScript delete method requires text response "success" for removing table row
             return Response('success', mimetype='text/plain')
         else:
-            log.debug('request.method: UNKNOWN')
+            log.warn('request.method: UNKNOWN')
+            raise NotFound('request.method: UNKNOWN')
     
     
     def on_user(self, request):
@@ -241,7 +244,8 @@ class Gui(object):
             # JavaScript delete method requires text response "success" for removing table row
             return Response('success', mimetype='text/plain')
         else:
-            log.debug('request.method: UNKNOWN')
+            log.warn('request.method: UNKNOWN')
+            raise NotFound('request.method: UNKNOWN')
 
 
     def update_single_glossary_term(self, request, glossary):
@@ -271,7 +275,7 @@ class Gui(object):
     def check_valid_item_type(self, item_type_name):
         if not self.is_valid_item_type(item_type_name):
             log.warn('Unknown item type: ' + item_type_name)
-            raise NotFound()
+            raise NotFound('Unknown item type: ' + item_type_name)
         return True
 
 
@@ -330,24 +334,25 @@ class Gui(object):
     
     
     def create_or_update_item(self, request, item_type_name, item_id):
+        '''
+        Decides to create a new item or update an existing item.
+        '''
         log.debug('create_or_update_item(' + str(request) + ', ' + item_type_name + ', ' + item_id+ ')')
         item_type = self.get_sodocu().get_config().get_item_type_by_name(item_type_name)
         item = self.sodocu.get_item_by_id(item_type, item_id)
         log.debug('item: ' + str(item))
-        if item is not None:
-            self.update_item(request, item)
-            item.get_meta_data().set_changed_by(self.get_user())
-            item.get_meta_data().set_changed_now()
-            self.get_sodocu().save_item(item)
-        else:
-            new_item = create_base_item(item_type, item_id, request.form['name'])
-            new_item.get_meta_data().set_created_by(self.get_user())
-            new_item.get_meta_data().set_created_now()
-            self.update_item(request, new_item)
-            if new_item is not None:
-                self.get_sodocu().add_item(new_item)
-                self.get_sodocu().save_item(new_item)
-
+        
+        if item is None:
+            item = create_base_item(item_type, item_id, request.form['name'])
+            item.get_meta_data().set_created_by(self.get_user())
+            item.get_meta_data().set_created_now()
+            self.get_sodocu().add_item(item)
+        
+        self.update_item(request, item)
+        item.get_meta_data().set_changed_by(self.get_user())
+        item.get_meta_data().set_changed_now()
+        self.get_sodocu().save_item(item)
+        
         return redirect('/%s/' % item_type_name)
 
 
@@ -357,18 +362,88 @@ class Gui(object):
         '''
         log.debug('update_item(' + str(request) + ', ' + str(item) + ')')
         for key in request.form:
+            request_values = ''.join(request.form.getlist(key))
+            log.debug('request_values(' + key + '): ' + str(request_values))
+            
+#             if request_values and request_values != '':
+#             if request_values:
+            if key.endswith('_by'):
+                # order of the two following statements are important because of removing deleted from-relations
+                self.update_from_relations(item, key, request_values)
+                self.update_value(item.get_relations(), key, request_values)
+            elif not key.startswith('_'):
+                self.update_value(item, key, request_values)
+
+
+    def update_from_relations(self, unchanged_item, key, request_values):
+        '''
+        Deletes from-relations of given by-relation and sets the new from-relations of given by-relation items.
+        '''
+        log.debug('update_from_relations(' + str(unchanged_item) + ', ' + key + ', ' + str(request_values) + ')')
+        if self.remove_from_relations(unchanged_item, key):
+            self.add_from_relation(unchanged_item, key, request_values)
+                    
+            
+    def remove_from_relations(self, unchanged_item, key):
+        '''
+        Removes all from-relations of given by-relation.
+        '''
+        log.debug('remove_from_relations(' + str(unchanged_item) + ', ' + key + ')')
+        
+        try:
+            getter_by_method = get_getter_method(unchanged_item.get_relations(), key)
+            existing_by_relation_item_ids = getter_by_method()
+            log.debug('existing_by_relation_item_ids: ' + str(existing_by_relation_item_ids))
+        except AttributeError:
+            log.info('Item <' + unchanged_item.get_id() + '> has not getter method for key <' + key + '>!')
+            return False
+        
+        for existing_by_relation_item_id in filter(None, existing_by_relation_item_ids):
             try:
-                setter_method = get_setter_method(item, key)
-                log.debug('setter_method: ' + str(setter_method))
-                setter_method(''.join(request.form.getlist(key)))
+                existing_by_relation_item = self.sodocu.get_item_by_id(ItemType(existing_by_relation_item_id.split('-')[0], ''), existing_by_relation_item_id)
+                getter_from_method = get_getter_method(existing_by_relation_item.get_relations(), key.replace('_by', '_from'))
+                existing_from_relation_items = getter_from_method()
+                log.debug('existing_from_relation_items: ' + existing_by_relation_item.get_id() + ' - ' + str(existing_from_relation_items))
+                existing_from_relation_items.remove(unchanged_item.get_id())
+                log.debug('removed_item_name: ' + unchanged_item.get_id())
+                self.get_sodocu().save_item(existing_by_relation_item)
+            except KeyError:
+                log.info('Item <' + existing_by_relation_item.get_id() + '> has no from relation to item <' + unchanged_item.get_id() + '>!')
+        return True
+
+
+    def add_from_relation(self, unchanged_item, key, request_values):
+        log.debug('add_from_relation(' + str(unchanged_item) + ', ' + key + ', ' + str(request_values) + ')')
+        
+        for request_item_id in filter(None, list(request_values.split(','))):
+            log.debug("request_item_id.split('-')[0]: " + request_item_id.split('-')[0])
+            request_item = self.sodocu.get_item_by_id(ItemType(request_item_id.split('-')[0], ''), request_item_id)
+            log.debug('request_item: ' + str(request_item))
+        
+            try:
+                adder_method = get_adder_method(request_item.get_relations(), key.replace('_by', '_from'))
+                log.debug('adder_method: ' + str(adder_method))
+                adder_method(unchanged_item.get_id())
+                request_item.get_meta_data().set_changed_by(self.get_user())
+                request_item.get_meta_data().set_changed_now()
+                self.get_sodocu().save_item(request_item)
             except AttributeError:
-                log.info('1. Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
-                try:
-                    setter_method = get_setter_method(item.get_relations(), key)
-                    log.debug('setter_method: ' + str(setter_method))
-                    setter_method(''.join(request.form.getlist(key)))
-                except AttributeError:
-                    log.info('2. Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
+                log.info('Item <' + request_item.get_id() + '> has not adder method for key <' + key.replace('_by', '_from') + '>!')
+                return False
+        return True
+
+
+    def update_value(self, item, key, request_values):
+        '''
+        Identifies the setter method for given key an sets the given value.
+        '''
+        log.debug('update_value(' + str(item) + ', ' + key + ', ' + request_values + ')')
+        try:
+            setter_method = get_setter_method(item, key)
+            log.debug('setter_method: ' + str(setter_method))
+            setter_method(request_values)
+        except AttributeError:
+            log.info('Item <' + item.get_id() + '> has not setter method for key <' + key + '>!')
 
 
     def get_item_by_name(self, item_type_name, item_id):

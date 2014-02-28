@@ -64,6 +64,11 @@ function addRowToRelationsTable(table_id) {
 	    		{{ key }}
    		      </td>
 		      <td>
+		        {% if key.endswith('_from') %}
+		          {%- for related_item in item.relations.get_related_items_by_relation_name(key) %}
+		            <a href="/{{ related_item.split('-')[0] }}/{{ related_item }}/" >{{ related_item }}</a>
+	    		  {%- endfor %}
+    			{% else %}
 		        <!-- {{ item.relations.get_related_items_by_relation_name(key)|safe }} -->
 				<input type="text" id="input_{{ key }}" name="{{ key }}" class="demo-default form-control" />
 				
@@ -99,6 +104,7 @@ function addRowToRelationsTable(table_id) {
 					/* set exiting realtions, needs te e delayed because of aynchronous ajax call */
 					setTimeout(function() { $selectize_{{ key }}[0].selectize.setValue({{ item.relations.get_related_items_by_relation_name(key)|safe }}); }, 1000);
 				</script>
+			    {% endif %}
    		      </td>
 		    </tr>
     		{%- endfor %}

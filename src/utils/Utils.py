@@ -79,11 +79,8 @@ def create_item(sodocu_config, item_config, filename):
     '''
     Creates an item from item_config file.
     '''
+    log.debug('create_item(' + str(sodocu_config) + ', ' + str(item_config) + ', ' + filename + ')')
     item_type_name = item_config.sections()[0]
-    log.debug('item_type_name: ' + item_type_name)
-    log.debug("item_config.get(item_type_name, 'id'): " + item_config.get(item_type_name, 'id'))
-    log.debug("item_config.get(item_type_name, 'name'): " + item_config.get(item_type_name, 'name'))
-    
     item = create_base_item(sodocu_config.get_item_type_by_name(item_type_name), item_config.get(item_type_name, 'id'), item_config.get(item_type_name, 'name'))
     item.set_filename(filename) 
     
@@ -109,10 +106,23 @@ def fill_item(obj, item_config, section):
             log.info('Item file has no setter method for option <' + option + '>!')
     
 
+def get_getter_method(obj, option):
+    getter_method = getattr(obj, 'get_' + option)
+    log.debug('getter_method: ' + str(getter_method))
+    return getter_method
+    
+
 def get_setter_method(obj, option):
     setter_method = getattr(obj, 'set_' + option)
     log.debug('setter_method: ' + str(setter_method))
     return setter_method
+    
+
+def get_adder_method(obj, option):
+    log.debug('looking for method: add_' + option)
+    adder_method = getattr(obj, 'add_' + option)
+    log.debug('adder_method: ' + str(adder_method))
+    return adder_method
     
 
 def merge_item_configs(first_config, second_config):
