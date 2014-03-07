@@ -83,11 +83,57 @@ class SoDocu(object):
         item_list = []
         for item in self.get_items_by_type(ItemType(item_type_name, '')):
             item_list.append({'label':item.name, 'id':item.id})
-#             item_list.append({'label':item.name})
         log.debug('item_list: ' + str(item_list))
         return json.dumps(item_list, indent=2)
-#         return json.dumps(item_list)
 
+
+    def get_all_items_as_json(self):
+        nodes = []
+        links = []
+        graph = {"nodes":nodes, "links":links}
+        i = 0
+        
+        # fill list of nodes separatly because of identifying index number source and targets for links later
+        for item_type in self.get_config().get_item_types():
+            for item in self.get_items_by_type(item_type):
+                nodes.append({"node":i, "name":item.id})
+
+        log.debug('nodes: ' + str(nodes))
+
+        # filling list of links between nodes with by-relations        
+        for item_type in self.get_config().get_item_types():
+            for node in nodes:
+                log.debug('node: ' + str(node))
+                node_object = json.loads(node)
+                log.debug('node_object: ' + str(node_object))
+                item = self.get_item_by_id( ItemType(node.name.split('-')[0]) , node.name) 
+                for key in item.item_type.valid_relations.keys():
+                    for related_item in item.relations.get_related_items_by_relation_name(key):
+                        links.append({'source':node.node, 
+                                      'target':next((x for x in nodes if x.name == related_item.get_id()), None), 
+                                      'name':key})
+                
+        log.debug('graph: ' + str(graph))
+        return json.dumps(graph, indent=2)
+
+# 
+# {
+# "nodes":[
+# {"node":0,"name":"node0"},
+# {"node":1,"name":"node1"},
+# {"node":2,"name":"node2"},
+# {"node":3,"name":"node3"},
+# {"node":4,"name":"node4"}
+# ],
+# "links":[
+# {"source":0,"target":2,"value":2},
+# {"source":1,"target":2,"value":2},
+# {"source":1,"target":3,"value":2},
+# {"source":0,"target":4,"value":2},
+# {"source":2,"target":3,"value":2},
+# {"source":2,"target":4,"value":2},
+# {"source":3,"target":4,"value":4}
+# ]}
 
     def add_item(self, item):
         log.debug('add_item(' + str(item) + ')')

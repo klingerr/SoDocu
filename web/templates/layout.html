@@ -17,6 +17,76 @@
 <!-- autocomplete via selectize.js -->
 <link rel="stylesheet" type="text/css" href="/css/selectize.css" />      
 <link rel="stylesheet" type="text/css" href="/css/selectize.bootstrap3.css" />      
+
+<!-- D3js example from http://alignedleft.com/tutorials/d3 -->
+<!-- <style type="text/css">
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;   /* We'll override this later */
+    background-color: teal;
+    margin-right: 2px;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+</style>
+ -->
+ 
+ 
+<!-- D3js example from https://leanpub.com/D3-Tips-and-Tricks/read#leanpub-auto-force-layout-diagrams -->
+<style>
+
+line{
+	stroke: #cccccc;
+	stroke-width: 1;
+}
+
+circle{
+	fill: blue;
+}
+
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: 100px;					
+    height: 28px;					
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+/* 
+path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
+circle {
+  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+text {
+  fill: #000;
+  font: 10px sans-serif;
+  pointer-events: none;
+}
+ */
+</style>
       
 <script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
 <!-- <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script> -->
@@ -52,6 +122,10 @@
 <!-- explain glossary terms as tooltip within text -->
 <script type="text/javascript" src="/js/tooltip.js"></script>
 <script type="text/javascript" src="/js/jquery.glossarize.js"></script>
+
+<!-- visualization -->
+<script type="text/javascript" src="/js/d3.min.js"></script>
+<!-- <script type="text/javascript" src="/js/vivagraph.min.js"></script> -->
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -198,6 +272,9 @@ $(function(){
  });
 });
 
+/* // load vivagraph
+var g = Viva.Graph.graph();
+ */
 </script>
  
  	<!-- horizontal menu bar -->

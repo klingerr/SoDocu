@@ -7,11 +7,11 @@ system. You can checkout your requirements at one point in time. So you know
 exactly what features are implemented at this time.
 
 # Requirements need to be developed
-Requirements are not fallen from th sky. They need to be developed. You can not
+Requirements have not fallen from the sky. They need to be developed. You can not
 solve problems in code which are laying in incomplete or inconsistent 
 requirements. Therefor you have to:
 * discover requirement sources (like stakeholder or law documents) 
-* investigate the system context
+* investigate the system context to identify processes, technical systems a.s.o.
 * identify containing business issues
 * find targets for solving these issues
 * describe scenarios to achieve the targets (user stories)
@@ -28,6 +28,7 @@ SoDocu is inspired by:
 * http://www.flonatel.de/projekte/rmtoo/
 
 # Installation
+## for running
 * install [Python 2.7.x](http://www.python.org/):
   * Linux: should already be installed
   * Windows: http://www.python.org/download/
@@ -42,6 +43,14 @@ SoDocu is inspired by:
   * Windows: pip install Jinja2
 * install SoDocu: 
 TODO
+
+## for testing and developing
+* install [nose](https://nose.readthedocs.org/en/latest/): 
+  * Linux: sudo pip install nose
+  * Windows: pip install nose
+* install [mock](https://code.google.com/p/mock/): 
+  * Linux: sudo pip install mock
+  * Windows: pip install mock
 
 # Usage
 TODO
@@ -67,6 +76,7 @@ TODO
 * graphical visualization of relations
 * i18n
 * links between requirements and source code and tests
-* export to pdf
+* export to pdf (srs - software requirements specification)
+* show number of issues for each issue type in left side menu
 
 Enjoy using SoDocu.
