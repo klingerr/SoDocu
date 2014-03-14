@@ -1,6 +1,6 @@
 [idea]
-id = idea-99
-name = this is a file update test
+id = idea-77
+name = idea-77
 description = 
 
 [meta]
@@ -10,4 +10,5 @@ changed_by = None
 changed_at = None
 
 [relations]
+invented_by = stakeholder-1, stakeholder-2
 

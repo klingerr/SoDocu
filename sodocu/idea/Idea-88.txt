@@ -1,6 +1,6 @@
 [idea]
-id = idea-99
-name = this is a file update test
+id = idea-88
+name = idea-88
 description = 
 
 [meta]

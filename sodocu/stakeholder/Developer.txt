@@ -6,6 +6,9 @@ description = Developer
 [meta]
 created_by = rklinger
 created_at = 20.02.2014 15:35
-changed_by = None
-changed_at = None
+changed_by = rklinger
+changed_at = 10.03.2014 13:36
+
+[relations]
+invented_from = idea-2
 

@@ -88,6 +88,11 @@ class SoDocu(object):
 
 
     def get_all_items_as_json(self):
+        '''
+        Returns all items for D3js as JSON data in form: 
+           {"nodes":[{"node":0,"name":"node0"}, ... ], 
+            "links":[{"source":0,"target":2,"value":2}, ... ]}
+        '''
         nodes = []
         links = []
         graph = {"nodes":nodes, "links":links}
@@ -97,43 +102,24 @@ class SoDocu(object):
         for item_type in self.get_config().get_item_types():
             for item in self.get_items_by_type(item_type):
                 nodes.append({"node":i, "name":item.id})
+                i = i + 1
 
         log.debug('nodes: ' + str(nodes))
 
-        # filling list of links between nodes with by-relations        
-        for item_type in self.get_config().get_item_types():
-            for node in nodes:
-                log.debug('node: ' + str(node))
-                node_object = json.loads(node)
-                log.debug('node_object: ' + str(node_object))
-                item = self.get_item_by_id( ItemType(node.name.split('-')[0]) , node.name) 
-                for key in item.item_type.valid_relations.keys():
-                    for related_item in item.relations.get_related_items_by_relation_name(key):
-                        links.append({'source':node.node, 
-                                      'target':next((x for x in nodes if x.name == related_item.get_id()), None), 
+        # filling list of links between nodes with by-relations
+        for node in nodes:
+            item = self.get_item_by_id(ItemType(node['name'].split('-')[0], '') , node['name'])
+            log.debug('item: ' + str(item))
+            for key in item.item_type.valid_relations.keys():
+                for related_item_id in item.relations.get_related_items_by_relation_name(key):
+                    if next((x for x in nodes if x['name'] == related_item_id), None) != None:
+                        links.append({'source':next((x for x in nodes if x['name'] == item.get_id()), None)['node'], 
+                                      'target':next((x for x in nodes if x['name'] == related_item_id), None)['node'],
                                       'name':key})
                 
         log.debug('graph: ' + str(graph))
         return json.dumps(graph, indent=2)
 
-# 
-# {
-# "nodes":[
-# {"node":0,"name":"node0"},
-# {"node":1,"name":"node1"},
-# {"node":2,"name":"node2"},
-# {"node":3,"name":"node3"},
-# {"node":4,"name":"node4"}
-# ],
-# "links":[
-# {"source":0,"target":2,"value":2},
-# {"source":1,"target":2,"value":2},
-# {"source":1,"target":3,"value":2},
-# {"source":0,"target":4,"value":2},
-# {"source":2,"target":3,"value":2},
-# {"source":2,"target":4,"value":2},
-# {"source":3,"target":4,"value":4}
-# ]}
 
     def add_item(self, item):
         log.debug('add_item(' + str(item) + ')')

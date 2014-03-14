@@ -12,6 +12,7 @@ from werkzeug.wrappers import Request, Response
 
 from src.SoDocu import SoDocu
 from src.model.Idea import Idea
+from src.model.Stakeholder import Stakeholder
 from src.utils.Config import Config
 from src.utils.ItemType import ItemType
 from src.view.Gui import Gui
@@ -471,9 +472,10 @@ class TestGui(unittest.TestCase):
         
 
     def test_update_from_relation(self):
-        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')        
-        assert self.gui.update_from_relations(idea, 'invented_by', ['stakeholder-1']) == None
-        
+        idea = Idea(ItemType('idea', ''), 'idea-1', 'idea-1')
+#         print idea        
+        assert self.gui.update_from_relations(idea, 'invented_by', 'stakeholder-1, stakeholder-2') == None
+
     
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

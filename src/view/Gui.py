@@ -69,6 +69,8 @@ class Gui(object):
             Rule('/<item_type_name>/<item_id>/', endpoint='single_item'),
             # special URL for getting item types as JSON data for jquery autocomplete
             Rule('/<item_type_name>/json/', endpoint='item_list_json'),
+            # special URL for getting all items as JSON data for D3js data vizualization
+            Rule('/d3js/json/', endpoint='d3js_json'),
             # special URL for entering or changing current username
             Rule('/user/', endpoint='user'),
             # special URL for searching over all items
@@ -197,6 +199,12 @@ class Gui(object):
         log.debug('on_item_list_json(' + str(request) + ', ' + item_type_name + ')')
         if request.method == 'GET':
             return Response(self.sodocu.get_items_by_type_name_as_json(item_type_name), mimetype='application/json')
+    
+    
+    def on_d3js_json(self, request):
+        log.debug('on_d3js_json(' + str(request) + ')')
+        if request.method == 'GET':
+            return Response(self.sodocu.get_all_items_as_json(), mimetype='application/json')
     
     
     def on_glossary(self, request):
