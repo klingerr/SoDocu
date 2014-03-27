@@ -95,6 +95,7 @@ class Config(object):
                 # fix options
                 item_type = ItemType(section, config.get(section, 'path'))
                 item_type.set_menu_position(config.get(section, 'menu_position'))
+                item_type.set_img_url(config.get(section, 'img_url'))
                 item_type.set_form_template(config.get(section, 'form_template'))
                 item_type.set_table_template(config.get(section, 'table_template'))
                 

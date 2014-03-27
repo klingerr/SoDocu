@@ -101,7 +101,7 @@ class SoDocu(object):
         # fill list of nodes separatly because of identifying index number source and targets for links later
         for item_type in self.get_config().get_item_types():
             for item in self.get_items_by_type(item_type):
-                nodes.append({"node":i, "name":item.id})
+                nodes.append({"node":i, "name":item.id, "img_url":item.item_type.img_url})
                 i = i + 1
 
         log.debug('nodes: ' + str(nodes))
@@ -111,11 +111,12 @@ class SoDocu(object):
             item = self.get_item_by_id(ItemType(node['name'].split('-')[0], '') , node['name'])
             log.debug('item: ' + str(item))
             for key in item.item_type.valid_relations.keys():
-                for related_item_id in item.relations.get_related_items_by_relation_name(key):
-                    if next((x for x in nodes if x['name'] == related_item_id), None) != None:
-                        links.append({'source':next((x for x in nodes if x['name'] == item.get_id()), None)['node'], 
-                                      'target':next((x for x in nodes if x['name'] == related_item_id), None)['node'],
-                                      'name':key})
+                if key.endswith('_by'):
+                    for related_item_id in item.relations.get_related_items_by_relation_name(key):
+                        if next((x for x in nodes if x['name'] == related_item_id), None) != None:
+                            links.append({'source':next((x for x in nodes if x['name'] == item.get_id()), None)['node'], 
+                                          'target':next((x for x in nodes if x['name'] == related_item_id), None)['node'],
+                                          'name':key})
                 
         log.debug('graph: ' + str(graph))
         return json.dumps(graph, indent=2)

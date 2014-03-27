@@ -296,7 +296,7 @@ class Gui(object):
 
 
     def render_new_item_as_form(self, item_type_name):
-        item_type = self.get_sodocu().get_config().get_item_type(item_type_name)
+        item_type = self.get_sodocu().get_config().get_item_type_by_name(item_type_name)
         new_id = item_type_name + '-' + str(get_max_id(self.sodocu.get_items_by_type(item_type)) + 1)
         temp_item = create_base_item(item_type, new_id, '')
         return self.render_one_item_as_form(temp_item)

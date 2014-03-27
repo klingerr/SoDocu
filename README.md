@@ -73,7 +73,7 @@ TODO
 * dashboard shown known issues i.e.: missing relations
 * graphical models for requirements (UML), targets (mind map) and system context (SysML)
 * dependency between model and item
-* graphical visualization of relations
+* ~~graphical visualization of relations~~
 * i18n
 * links between requirements and source code and tests
 * export to pdf (srs - software requirements specification)
