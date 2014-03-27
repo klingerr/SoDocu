@@ -14,6 +14,7 @@ class ItemType(object):
         self.__path = path
         self.__menu_position = None
         self.__img_url = None
+        self.__item_count = None
         self.__form_template = None
         self.__table_template = None
         self.__valid_relations = dict()
@@ -40,6 +41,14 @@ class ItemType(object):
 
     def set_img_url(self, value):
         self.__img_url = value
+
+
+    def get_item_count(self):
+        return self.__item_count
+
+
+    def set_item_count(self, value):
+        self.__item_count = value
 
 
     def get_table_template(self):
@@ -70,6 +79,7 @@ class ItemType(object):
     path = property(get_path, None, None, None)
     menu_position = property(get_menu_position, set_menu_position, None, None)
     img_url = property(get_img_url, set_img_url, None, None)
+    item_count = property(get_item_count, set_item_count, None, None)
     form_template = property(get_form_template, set_form_template, None, None)
     table_template = property(get_table_template, set_table_template, None, None)
     valid_relations = property(get_valid_relations, None, None, None)

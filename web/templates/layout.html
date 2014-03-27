@@ -324,7 +324,7 @@ var g = Viva.Graph.graph();
     class="active"
 {% endif %}                        
             >
-              <a href="/{{ valid_item_type.get_name() }}/" >{{ valid_item_type.get_name() }}</a></li>
+              <a href="/{{ valid_item_type.get_name() }}/" >{{ valid_item_type.get_name() }} ({{ valid_item_type.get_item_count() }})</a></li>
 {%- endfor %}
           </ul>
         </div>

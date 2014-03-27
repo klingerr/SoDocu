@@ -38,6 +38,7 @@ class SoDocu(object):
         # dictionary/map with item_type_name as key and set of items as value
         self.__items = self.initialize_items_dictionary()
         self.read_all_items(self.__config)
+        self.set_item_counts()
 
 
     def initialize_items_dictionary(self):
@@ -147,6 +148,12 @@ class SoDocu(object):
             item = create_item(sodocu_config, item_config, filename)
             self.add_item(item)
 
+
+    def set_item_counts(self):
+        log.debug('set_item_counts')
+        for item_type in self.config.get_item_types():
+            item_type.set_item_count(len(self.get_items_by_type(item_type)))
+        
 
     def set_attribut(self, item, attribute, value):
         log.debug('set_attribut: ' + str(item) + ', ' + attribute + ', ' + value + ')')

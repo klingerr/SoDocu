@@ -135,6 +135,11 @@ class TestSoDocu(unittest.TestCase):
 #         print graph
         assert 'idea-1' in str(graph)
         
+        
+    def test_set_item_counts(self):
+        item = self.sodocu.get_item_by_id(ItemType('idea', ''), 'idea-1')
+        assert item.get_item_type().get_item_count() > 0
+        
     
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

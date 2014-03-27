@@ -71,12 +71,17 @@ TODO
 * ~~fill relations between items~~
 * ~~create backward (from) relations automaticly~~
 * dashboard shown known issues i.e.: missing relations
-* graphical models for requirements (UML), targets (mind map) and system context (SysML)
+* graphical models:
+  * BPMN for processes
+  * UML for requirements
+  * MindMap for targets 
+  * SysML for system context
 * dependency between model and item
 * ~~graphical visualization of relations~~
 * i18n
 * links between requirements and source code and tests
 * export to pdf (srs - software requirements specification)
-* show number of issues for each issue type in left side menu
+* ~~show number of issues for each issue type in left side menu~~
+* add attachments (images, documents, ...) to items
 
 Enjoy using SoDocu.
