@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 class Idea(AbstractItem):
     '''
     An idea isn't a direct requirement artifact. It has to be investigated for 
-    business targets.
+    business objectivs.
     '''
 
     def __init__(self, item_type, identity, name):

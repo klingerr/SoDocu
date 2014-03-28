@@ -1,6 +1,6 @@
 [glossary]
 requirement = single information what the software must implement
-target = feature which aims a business problem
+objective = feature which aims a business problem
 process = process which is executed within the context of this project
 stakeholder = a person, group or organization with an interest in a project, see i.e.: 'stakeholder management' at wikipedia
 idea = is just an thought of an improvement that must be invstigated

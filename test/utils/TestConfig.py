@@ -55,9 +55,9 @@ class Test(unittest.TestCase):
  
     def test_get_item_types(self):
 #         print self.config.get_item_types()
-        assert 'idea' == self.config.get_item_types()[0].get_name()
-        assert 'stakeholder' == self.config.get_item_types()[1].get_name()
-        assert 'document' == self.config.get_item_types()[2].get_name()
+        assert 'idea' == self.config.get_item_types()[1].get_name()
+        assert 'stakeholder' == self.config.get_item_types()[2].get_name()
+        assert 'document' == self.config.get_item_types()[3].get_name()
         assert 'invented_by' in str(self.config.get_item_types()[0].get_valid_relations())
         
  

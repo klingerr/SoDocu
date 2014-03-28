@@ -13,8 +13,8 @@ requirements. Therefor you have to:
 * discover requirement sources (like stakeholder or law documents) 
 * investigate the system context to identify processes, technical systems a.s.o.
 * identify containing business issues
-* find targets for solving these issues
-* describe scenarios to achieve the targets (user stories)
+* find objectives for solving these issues
+* describe scenarios to achieve the objectives (user stories)
 * strip down these scenarios in atomic requirements divided in data, function, 
 state an quality
 
@@ -74,7 +74,7 @@ TODO
 * graphical models:
   * BPMN for processes
   * UML for requirements
-  * MindMap for targets 
+  * MindMap for objectives 
   * SysML for system context
 * dependency between model and item
 * ~~graphical visualization of relations~~

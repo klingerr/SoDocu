@@ -20,7 +20,7 @@ class Relations(object):
     def __init__(self):
         # userStory
         self.__accomplished_by = set()
-        # target
+        # objective
         self.__accomplished_from = set()
         # requirement
         self.__extracted_by =  set()
@@ -32,13 +32,13 @@ class Relations(object):
         self.__grouped_from = set()
         # stakeholder 
         self.__invented_by = set()
-        # problem, target, idea
+        # problem, objective, idea
         self.__invented_from = set()
-        # target
+        # objective
         self.__refined_by = set()
-        # target
+        # objective
         self.__refined_from = set()
-        # target
+        # objective
         self.__solved_by = set()
         # problem
         self.__solved_from = set()
