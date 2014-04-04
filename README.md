@@ -83,5 +83,12 @@ TODO
 * export to pdf (srs - software requirements specification)
 * ~~show number of issues for each issue type in left side menu~~
 * add attachments (images, documents, ...) to items
+* easy installation with pip and/or easy_install
+
+# Known Bugs
+* ~~glossary terms within glossary leads to wrong displayed original words~~
+* adding new item do not increase item count in left menu bar
+* OK button at delete popup do not work
+
 
 Enjoy using SoDocu.

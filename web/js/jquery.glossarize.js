@@ -126,6 +126,7 @@
          */
 
         if (node = node.firstChild) {
+            //console.log('node.firstChild: ' + node.firstChild);
             do {
                 // Recursively call traverseChildNodes
                 // on each child node
@@ -145,15 +146,22 @@
         var temp = document.createElement('div'),
             data = node.data;            
 
+        // for each glossary term
         for(var i =0; i < this.terms.length; i++){
+        	//console.log('this.terms[' + i + ']: ' + this.terms[i]);
+        	
 
           var pattern = '\\b'+this.terms[i] + '\\b',
               re = new RegExp(pattern, this.regexOption)
           
-          if(re.test(data)){
+          //console.log('data 1: (' + (data.indexOf(this.options.replaceTag) !== -1) + ')' + data);
+          // text musst exist and do not contain another glossary replacement
+          if(re.test(data) && !(data.indexOf(this.options.replaceTag) !== -1)){
 
             data = data.replace(re, 
-              '<'+this.options.replaceTag+' tabIndex="0" class="glossarizer_replaced" title="'+this.descriptions[i]+'">' + '$&' + '</'+ this.options.replaceTag+'>')
+                    '<'+this.options.replaceTag+' tabIndex="0" class="glossarizer_replaced" title="'+this.descriptions[i]+'">' + '$&' + '</'+ this.options.replaceTag+'>')
+
+              // console.log('data 2: ' + data);
           }          
         }
 
