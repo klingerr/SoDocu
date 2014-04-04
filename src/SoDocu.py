@@ -131,6 +131,7 @@ class SoDocu(object):
 #             self.__items[item_type.get_name()] = set()
 #             items = self.get_items_by_type(item_type)
         items.add(item)
+        item_type.increment_item_count()
 
         
     glossary = property(get_glossary, None, None, None)
@@ -197,6 +198,7 @@ class SoDocu(object):
         
         try:
             items.remove(item)
+            item.get_item_type().decrement_item_count()
             return True
         except KeyError:
             log.info('There is no item <' + item.get_id() + '> to remove!')

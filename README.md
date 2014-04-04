@@ -87,8 +87,8 @@ TODO
 
 # Known Bugs
 * ~~glossary terms within glossary leads to wrong displayed original words~~
-* adding new item do not increase item count in left menu bar
-* OK button at delete popup do not work
+* ~~adding new item do not increase item count in left menu bar~~
+* ~~OK button at delete popup do not work~~
 
 
 Enjoy using SoDocu.

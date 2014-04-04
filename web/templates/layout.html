@@ -18,32 +18,8 @@
 <link rel="stylesheet" type="text/css" href="/css/selectize.css" />      
 <link rel="stylesheet" type="text/css" href="/css/selectize.bootstrap3.css" />      
 
-<!-- D3js example from http://alignedleft.com/tutorials/d3 -->
-<!-- <style type="text/css">
-div.bar {
-    display: inline-block;
-    width: 20px;
-    height: 75px;   /* We'll override this later */
-    background-color: teal;
-    margin-right: 2px;
-}
-
-.axis path, .axis line {
-    fill: none;
-    stroke: black;
-    shape-rendering: crispEdges;
-}
-
-.axis text {
-    font-family: sans-serif;
-    font-size: 11px;
-}
-</style>
- -->
- 
- 
 <!-- D3js example from https://leanpub.com/D3-Tips-and-Tricks/read#leanpub-auto-force-layout-diagrams -->
-<style>
+<style type="text/css">
 
 line{
 	stroke: #cccccc;
@@ -67,25 +43,6 @@ div.tooltip {
     pointer-events: none;			
 }
 
-/* 
-path.link {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
-}
-
-circle {
-  fill: #ccc;
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-text {
-  fill: #000;
-  font: 10px sans-serif;
-  pointer-events: none;
-}
- */
 </style>
 <link rel="stylesheet" href="/css/joint.css" />
 
@@ -121,6 +78,7 @@ text {
 @see: http://bootboxjs.com/
  -->
 <script type="text/javascript" src="/js/bootbox.min.js"></script>
+<script type="text/javascript" src="/js/jquery.blockui.js"></script>
 
 <!-- explain glossary terms as tooltip within text -->
 <script type="text/javascript" src="/js/tooltip.js"></script>
@@ -128,7 +86,6 @@ text {
 
 <!-- visualization -->
 <script type="text/javascript" src="/js/d3.min.js"></script>
-<!-- <script type="text/javascript" src="/js/vivagraph.min.js"></script> -->
 
 <script type="text/javascript">
 $(document).ready(function() {

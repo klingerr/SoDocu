@@ -154,7 +154,8 @@ class Gui(object):
                 return self.create_or_update_item(request, item_type_name, item_id)
         elif request.method == 'DELETE':
             log.debug('request.method: DELETE')
-            self.get_sodocu().delete_item(item_type_name, item_id)
+            item = self.get_sodocu().get_item_by_id(item_type, item_id)
+            self.get_sodocu().delete_item(item)
             # JavaScript delete method requires text response "success" for removing table row
             return Response('success', mimetype='text/plain')
         else:

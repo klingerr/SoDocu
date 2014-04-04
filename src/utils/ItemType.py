@@ -14,7 +14,7 @@ class ItemType(object):
         self.__path = path
         self.__menu_position = None
         self.__img_url = None
-        self.__item_count = None
+        self.__item_count = 0
         self.__form_template = None
         self.__table_template = None
         self.__valid_relations = dict()
@@ -49,6 +49,14 @@ class ItemType(object):
 
     def set_item_count(self, value):
         self.__item_count = value
+
+
+    def increment_item_count(self):
+        self.__item_count += 1
+
+
+    def decrement_item_count(self):
+        self.__item_count -= 1
 
 
     def get_table_template(self):
