@@ -226,6 +226,7 @@ Do not allow adding new vertices: .connection-wrap { pointer-events: none; }
 
 */
 
+
 /* foreignObject in joint.shapes.basic.TextBlock */
 .TextBlock .fobj body {
     background-color: transparent;

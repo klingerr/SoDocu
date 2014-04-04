@@ -1,0 +1,16 @@
+[objective]
+id = objective-1
+name = vision
+description = my vision
+
+[meta]
+created_by = rklinger
+created_at = 01.04.2014 18:32
+changed_by = rklinger
+changed_at = 01.04.2014 18:32
+
+[relations]
+accomplished_by = 
+invented_by = 
+refined_by = 
+

@@ -9,15 +9,63 @@ $(function () {
 	
 	var graph = new joint.dia.Graph;
 	
+	var ClickableView = joint.dia.ElementView.extend({
+	    pointerdown: function () {
+	        this._click = true;
+	        joint.dia.ElementView.prototype.pointerdown.apply(this, arguments);
+	    },
+	    pointermove: function () {
+	        this._click = false;
+	        joint.dia.ElementView.prototype.pointermove.apply(this, arguments);
+	    },
+	    pointerup: function (evt, x, y) {
+	        if (this._click) {
+	            this.notify('cell:click', evt, x, y);
+	        } else {
+	            joint.dia.ElementView.prototype.pointerup.apply(this, arguments);
+	        }
+	    }
+	});
+	
 	var paper = new joint.dia.Paper({
 	    el: $('#myholder'),
 	    width: 800,
-	    height: 200,
+	    height: 300,
+	    gridSize: 10,
 	    model: graph
 	});
+
+	var stencil = new joint.shapes.basic.Rect({
+	    position: { x: 0, y: 0 },
+	    size: { width: 800, height: 50 },
+	    attrs: { rect: { fill: 'yellow', style:{'pointer-events':'none'} }, text: { text: 'stencil', fill: 'grey' }, interactive: false }
+	});	
+		
+	var rectTemplate = new joint.shapes.basic.Rect({
+	    position: { x: 10, y: 10 },
+	    size: { width: 100, height: 30 },
+	    attrs: { rect: { fill: 'red' }, text: { text: 'my box', fill: 'white' } }
+	});
+
+	var linkTemplate = new joint.dia.Link({
+	    source: { x: 120, y: 25 },
+	    target: { x: 220, y: 25 },
+	    attrs: {}
+	});
+
+	linkTemplate.attr({
+	    //'.connection': { stroke: 'black', style:{'pointer-events':'none'} },
+	    //'.connection-wrap': { style:{'pointer-events':'none'} },
+	    '.connection': { stroke: 'red' },
+	    '.marker-source': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' },
+	    '.marker-target': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' }
+	});
+	
+	stencil.embed(rectTemplate);
+	stencil.embed(linkTemplate);
 	
 	var rect = new joint.shapes.basic.Rect({
-	    position: { x: 100, y: 30 },
+	    position: { x: 100, y: 80 },
 	    size: { width: 100, height: 30 },
 	    attrs: { rect: { fill: 'blue' }, text: { text: 'my box', fill: 'white' } }
 	});
@@ -30,22 +78,44 @@ $(function () {
 	    target: { id: rect2.id }
 	});
 	
-	var paperSmall = new joint.dia.Paper({
-	    el: $('#myholder-small'),
-	    width: 600,
-	    height: 100,
-	    model: graph
-	});
-	paperSmall.scale(.5);
-	paperSmall.$el.css('pointer-events', 'none');
-
-	graph.addCells([rect, rect2, link]);
+	graph.addCells([stencil, rectTemplate, linkTemplate, rect, rect2, link]);
 	
-/* 	graph.on('all', function(eventName, cell) {
+	paper.on('cell:pointerdown',
+		function(cellView, evt, x, y) { 
+			// console.log('cell view ' + cellView.model.id + ' was clicked');
+			// duplicate clicked element within the stencil to keep it 
+			if (y < 50) {
+				cellNew = cellView.model.clone();
+				graph.addCell(cellNew);
+				console.log(cellNew);
+				if (cellNew instanceof joint.dia.Link) {
+					cellNew.set('source', { x: 120, y: 125 })
+					cellNew.set('target', { x: 220, y: 125 })
+					cellView.set('vertices', [])
+				} else {
+					cellNew.translate(0,100);
+				}
+			}
+	   /*  $('#message').text('click!'); */
+	});
+	paper.on('cell:pointerup', function () {
+		//console.log('pointerup!');
+	    // $('#message').text('pointerup!');
+	});
+	paper.on('blank:pointerup', function () {
+		//console.log('blank!');
+	    // $('#message').text('blank!');
+	});
+/*  	graph.on('batch:start', function(eventName, cell) {
+	    console.log(arguments);
+		cellNew = cell.clone();
+		graph.addCell(cellNew);
+	});
+ */	
+/*  	graph.on('all', function(eventName, cell) {
 	    console.log(arguments);
 	});
  */	
-	
 });
 
 </script>
@@ -54,8 +124,8 @@ $(function () {
 <div class="content">
 
   <h1 class="page-header">Objectives Chart</h1>
-  	<div id="myholder"> </div>
-  	<div id="myholder-small"> </div>
+<!--   	<div id="stencil" style="width:800px; height:50px; border: 1px solid #b3b2b2;"> </div> -->
+  	<div id="myholder" style="width:800px; height:300px; border: 1px solid #b3b2b2;"> </div>
 
 
   <h2>{{ item_type }}s table</h2>
